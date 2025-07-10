@@ -1,0 +1,269 @@
+/* Landing Page Style Therapist Cards */
+.landing-therapist-cards {
+  position: relative;
+  width: 500px;
+  min-width: 320px;
+  height: 340px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 0;
+  margin: 0 auto;
+  transform: translateX(20px);
+}
+
+.landing-therapist-card {
+  width: 253px;
+  height: 300px;
+  aspect-ratio: 253/300;
+  border-radius: 20px;
+  border: 1px solid rgba(201, 201, 201, 0.88);
+  background: white;
+  backdrop-filter: blur(18.3px);
+  box-shadow: 0 4px 24px rgba(0,0,0,0.10);
+  position: absolute;
+  flex-shrink: 0;
+  transform: rotate(-5deg);
+  overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+.landing-therapist-card.card1 {
+  left: -15px;
+  top: 30px;
+  z-index: 1;
+}
+
+.landing-therapist-card.card2 {
+  left: 90px;
+  top: 0;
+  z-index: 2;
+  transform: rotate(0deg);
+}
+
+.landing-therapist-card.card3 {
+  left: 195px;
+  top: 40px;
+  z-index: 0;
+  transform: rotate(5deg);
+}
+
+/* Unified hover effects - all cards animate when hovering over any card */
+.landing-therapist-cards:hover .landing-therapist-card.card1 {
+  transform: rotate(-8deg) translateX(-35px) translateY(0px);
+  box-shadow: 0 8px 35px rgba(0,0,0,0.15);
+}
+
+.landing-therapist-cards:hover .landing-therapist-card.card2 {
+  transform: rotate(0deg) translateY(-8px) scale(1.03);
+  box-shadow: 0 12px 40px rgba(0,0,0,0.18);
+  z-index: 10 !important;
+}
+
+.landing-therapist-cards:hover .landing-therapist-card.card3 {
+  transform: rotate(8deg) translateX(35px) translateY(0px);
+  box-shadow: 0 8px 35px rgba(0,0,0,0.15);
+}
+
+.landing-therapist-img {
+  width: 90px;
+  height: 90px;
+  object-fit: cover;
+  border-radius: 15px;
+  margin-bottom: 16px;
+  border: 3px solid rgba(255, 255, 255, 0.8);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.landing-therapist-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  width: 100%;
+}
+
+.landing-therapist-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: #222;
+  margin-bottom: 6px;
+  line-height: 1.2;
+}
+
+.landing-therapist-desc {
+  font-size: 14px;
+  color: #666;
+  margin-bottom: 4px;
+  line-height: 1.3;
+  font-weight: 500;
+}
+
+.landing-therapist-rating {
+  font-size: 12px;
+  color: #888;
+  margin-bottom: 16px;
+  font-weight: 400;
+}
+
+.landing-therapist-btn {
+  width: 100px;
+  height: 32px;
+  font-size: 13px;
+  border-radius: 16px;
+  background: #222;
+  color: #fff;
+  border: none;
+  align-self: center;
+  transition: all 0.2s ease;
+  font-weight: 600;
+}
+
+.landing-therapist-btn:hover {
+  background: #0B1215;
+  transform: translateY(-1px);
+}
+
+/* Responsive adjustments for landing page style cards */
+@media (max-width: 900px) {
+  .landing-therapist-cards {
+    width: 100%;
+    min-width: 0;
+    height: 300px;
+    margin-bottom: 24px;
+    transform: translateX(-20px);
+  }
+  
+  .landing-therapist-card {
+    height: 260px;
+    padding: 16px;
+  }
+  
+  .landing-therapist-img {
+    width: 60px;
+    height: 60px;
+    margin-bottom: 12px;
+  }
+}
+
+@media (max-width: 600px) {
+  .landing-therapist-cards {
+    height: 250px;
+    transform: translateX(-25px);
+  }
+  
+  .landing-therapist-card {
+    width: 130px !important;
+    min-width: 130px !important;
+    max-width: 130px !important;
+    height: 230px !important;
+    min-height: 230px !important;
+    max-height: 230px !important;
+    padding: 12px;
+  }
+  
+  .landing-therapist-img {
+    width: 45px;
+    height: 45px;
+    margin-bottom: 8px;
+  }
+
+  .landing-therapist-title {
+    font-size: 14px;
+  }
+
+  .landing-therapist-desc {
+    font-size: 11px;
+  }
+
+  .landing-therapist-rating {
+    font-size: 10px;
+    margin-bottom: 12px;
+  }
+
+  .landing-therapist-btn {
+    width: 70px;
+    height: 24px;
+    font-size: 10px;
+  }
+}
+
+/* Mobile button styling */
+@media (max-width: 900px) {
+  #find-therapist-btn {
+    font-size: 16px;
+  }
+}
+
+@media (max-width: 600px) {
+  #find-therapist-btn {
+    font-size: 14px;
+  }
+}
+
+/* Liquid Glass Button Styles */
+.liquid-glass-btn {
+  background: rgba(255, 255, 255, 0.25);
+  backdrop-filter: blur(25px);
+  -webkit-backdrop-filter: blur(25px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 20px;
+  box-shadow: 
+    0 8px 32px rgba(0, 0, 0, 0.1),
+    0 2px 6px rgba(0, 0, 0, 0.05),
+    inset 0 1px 0 rgba(255, 255, 255, 0.5),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.1);
+  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.8);
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.liquid-glass-btn::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(
+    45deg,
+    transparent 30%,
+    rgba(255, 255, 255, 0.3) 50%,
+    transparent 70%
+  );
+  transform: translateX(-100%) translateY(-100%) rotate(45deg);
+  transition: transform 0.6s ease;
+  pointer-events: none;
+}
+
+.liquid-glass-btn:hover::before {
+  transform: translateX(100%) translateY(100%) rotate(45deg);
+}
+
+.liquid-glass-btn:hover {
+  background: rgba(255, 255, 255, 0.35);
+  border-color: rgba(255, 255, 255, 0.4);
+  box-shadow: 
+    0 12px 40px rgba(0, 0, 0, 0.15),
+    0 4px 8px rgba(0, 0, 0, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.6),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.15);
+  transform: translateY(-2px);
+}
+
+.liquid-glass-btn:active {
+  transform: translateY(0);
+  box-shadow: 
+    0 6px 24px rgba(0, 0, 0, 0.12),
+    0 2px 4px rgba(0, 0, 0, 0.06),
+    inset 0 1px 0 rgba(255, 255, 255, 0.4),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.2);
+} 
