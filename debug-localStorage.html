@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>localStorage Debug - Therapy Field</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="therapist-data.js"></script>
+</head>
+<body class="bg-gray-50 min-h-screen p-8">
+    <div class="max-w-4xl mx-auto">
+        <h1 class="text-3xl font-bold mb-8 text-center">localStorage Debug Tool</h1>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Current State Panel -->
+            <div class="bg-white rounded-lg p-6 shadow">
+                <h2 class="text-xl font-semibold mb-4">Current State</h2>
+                <div class="space-y-4">
+                    <button onclick="checkCurrentState()" class="w-full bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600">
+                        Check Current State
+                    </button>
+                    <div id="currentState" class="text-sm bg-gray-100 p-3 rounded max-h-40 overflow-y-auto"></div>
+                </div>
+            </div>
+            
+            <!-- Test Actions Panel -->
+            <div class="bg-white rounded-lg p-6 shadow">
+                <h2 class="text-xl font-semibold mb-4">Test Actions</h2>
+                <div class="space-y-2">
+                    <button onclick="addTestTherapist()" class="w-full bg-green-500 text-white py-2 px-4 rounded hover:bg-green-600">
+                        Add Test Therapist
+                    </button>
+                    <button onclick="clearLocalStorage()" class="w-full bg-red-500 text-white py-2 px-4 rounded hover:bg-red-600">
+                        Clear localStorage
+                    </button>
+                    <button onclick="testIntegration()" class="w-full bg-purple-500 text-white py-2 px-4 rounded hover:bg-purple-600">
+                        Test Integration
+                    </button>
+                    <button onclick="simulateRegistration()" class="w-full bg-yellow-500 text-white py-2 px-4 rounded hover:bg-yellow-600">
+                        Simulate Registration
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Log Panel -->
+        <div class="bg-white rounded-lg p-6 shadow mt-6">
+            <h2 class="text-xl font-semibold mb-4">Debug Log</h2>
+            <div id="debugLog" class="text-sm bg-gray-900 text-green-400 p-4 rounded max-h-80 overflow-y-auto font-mono"></div>
+            <button onclick="clearLog()" class="mt-2 bg-gray-500 text-white py-1 px-3 rounded hover:bg-gray-600">
+                Clear Log
+            </button>
+        </div>
+        
+        <!-- Test Cards Container -->
+        <div class="bg-white rounded-lg p-6 shadow mt-6">
+            <h2 class="text-xl font-semibold mb-4">Test Cards Display</h2>
+            <div id="testCardsContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+        </div>
+    </div>
+
+    <script>
+        // Debug logging function
+        function log(message) {
+            const logElement = document.getElementById('debugLog');
+            const timestamp = new Date().toLocaleTimeString();
+            logElement.innerHTML += `[${timestamp}] ${message}\n`;
+            logElement.scrollTop = logElement.scrollHeight;
+            console.log(message);
+        }
+        
+        function clearLog() {
+            document.getElementById('debugLog').innerHTML = '';
+        }
+        
+        // Check current state
+        function checkCurrentState() {
+            log('🔍 Checking current state...');
+            
+            const stateElement = document.getElementById('currentState');
+            
+            // Check localStorage
+            const therapistData = localStorage.getItem('therapistData');
+            const therapistCoordinates = localStorage.getItem('therapistCoordinates');
+            
+            log(`📥 localStorage therapistData: ${therapistData ? 'EXISTS' : 'EMPTY'}`);
+            log(`📍 localStorage therapistCoordinates: ${therapistCoordinates ? 'EXISTS' : 'EMPTY'}`);
+            
+            // Check window.therapistData
+            const windowData = window.therapistData;
+            log(`🪟 window.therapistData: ${windowData ? windowData.length + ' therapists' : 'NOT FOUND'}`);
+            
+            // Display results
+            let stateHTML = '<div class="space-y-2">';
+            stateHTML += `<div><strong>localStorage therapistData:</strong> ${therapistData ? 'EXISTS (' + JSON.parse(therapistData).length + ' items)' : 'EMPTY'}</div>`;
+            stateHTML += `<div><strong>localStorage coordinates:</strong> ${therapistCoordinates ? 'EXISTS' : 'EMPTY'}</div>`;
+            stateHTML += `<div><strong>window.therapistData:</strong> ${windowData ? windowData.length + ' therapists' : 'NOT FOUND'}</div>`;
+            
+            if (therapistData) {
+                const parsed = JSON.parse(therapistData);
+                stateHTML += '<div class="mt-2"><strong>localStorage contents:</strong></div>';
+                stateHTML += '<div class="text-xs bg-gray-200 p-2 rounded mt-1 max-h-32 overflow-y-auto">';
+                parsed.forEach((therapist, index) => {
+                    stateHTML += `${index + 1}. ID: ${therapist.id}, Name: ${therapist.first_name} ${therapist.last_name}, Title: ${therapist.title}<br>`;
+                });
+                stateHTML += '</div>';
+            }
+            
+            stateHTML += '</div>';
+            stateElement.innerHTML = stateHTML;
+        }
+        
+        // Add test therapist
+        function addTestTherapist() {
+            log('➕ Adding test therapist...');
+            
+            const testTherapist = {
+                id: 1001,
+                first_name: "Test",
+                last_name: "Therapist",
+                title: "Psychologist",
+                area: "Test Area",
+                city: "Athens",
+                services: {
+                    in_person_therapy: { available: true, price: 75 },
+                    online_therapy: { available: true, price: 70 }
+                },
+                therapy_approaches: ["CBT", "Test Therapy"],
+                therapy_approaches_keys: ["cbt", "test-therapy"],
+                languages: ["English", "Greek"],
+                languageKeys: ["english", "greek"],
+                cityKey: "athens",
+                gender: "female",
+                education: "PhD in Psychology",
+                experience: "5 years",
+                cost: 75,
+                currency: "EUR",
+                image: "User Panel Media/therapist1.png",
+                distance: 2.5,
+                rating: 4.8
+            };
+            
+            // Get existing data or create new array
+            let existingData = [];
+            const savedData = localStorage.getItem('therapistData');
+            if (savedData) {
+                existingData = JSON.parse(savedData);
+            }
+            
+            // Check if therapist with this ID already exists
+            const existingIndex = existingData.findIndex(t => t.id === testTherapist.id);
+            if (existingIndex >= 0) {
+                existingData[existingIndex] = testTherapist;
+                log('✏️ Updated existing test therapist');
+            } else {
+                existingData.push(testTherapist);
+                log('➕ Added new test therapist');
+            }
+            
+            // Save to localStorage
+            localStorage.setItem('therapistData', JSON.stringify(existingData));
+            
+            // Add coordinates
+            const coordinates = {
+                1001: { lat: 37.9755, lng: 23.7348 }
+            };
+            localStorage.setItem('therapistCoordinates', JSON.stringify(coordinates));
+            
+            log(`✅ Test therapist saved to localStorage. Total therapists: ${existingData.length}`);
+            
+            // Test integration immediately
+            testIntegration();
+        }
+        
+        // Clear localStorage
+        function clearLocalStorage() {
+            log('🗑️ Clearing localStorage...');
+            localStorage.removeItem('therapistData');
+            localStorage.removeItem('therapistCoordinates');
+            log('✅ localStorage cleared');
+            checkCurrentState();
+        }
+        
+        // Test integration
+        function testIntegration() {
+            log('🧪 Testing integration...');
+            
+            if (typeof window.loadAndMergeLocalStorageTherapists === 'function') {
+                log('🔄 Running loadAndMergeLocalStorageTherapists...');
+                const result = window.loadAndMergeLocalStorageTherapists();
+                log(`✅ Integration function returned: ${result ? result.length + ' new therapists' : 'no result'}`);
+                
+                // Check if therapist data was updated
+                const currentCount = window.therapistData ? window.therapistData.length : 0;
+                log(`📊 Current window.therapistData count: ${currentCount}`);
+                
+                // Try to populate test cards
+                populateTestCards();
+                
+            } else {
+                log('❌ loadAndMergeLocalStorageTherapists function not found');
+            }
+        }
+        
+        // Simulate registration form submission
+        function simulateRegistration() {
+            log('🎭 Simulating registration form submission...');
+            
+            const newTherapist = {
+                id: 1002,
+                first_name: "Simulated",
+                last_name: "Registration",
+                title: "Child Psychologist",
+                area: "Kolonaki",
+                city: "Athens",
+                services: {
+                    in_person_therapy: { available: true, price: 80 },
+                    online_therapy: { available: false, price: 0 }
+                },
+                therapy_approaches: ["Child Psychology", "Play Therapy"],
+                therapy_approaches_keys: ["child-psychology", "play-therapy"],
+                languages: ["Greek"],
+                languageKeys: ["greek"],
+                cityKey: "athens",
+                gender: "male",
+                education: "MSc in Child Psychology",
+                experience: "8 years",
+                cost: 80,
+                currency: "EUR",
+                image: "User Panel Media/therapist2.png",
+                distance: 1.8,
+                rating: 4.6
+            };
+            
+            // Get existing registered therapists (not the full array)
+            let registeredTherapists = [];
+            const savedData = localStorage.getItem('therapistData');
+            if (savedData) {
+                registeredTherapists = JSON.parse(savedData);
+            }
+            
+            // Add the new therapist
+            registeredTherapists.push(newTherapist);
+            
+            // Save only the registered therapists (this is what the form should do)
+            localStorage.setItem('therapistData', JSON.stringify(registeredTherapists));
+            
+            // Add coordinates
+            let coordinates = {};
+            const savedCoordinates = localStorage.getItem('therapistCoordinates');
+            if (savedCoordinates) {
+                coordinates = JSON.parse(savedCoordinates);
+            }
+            coordinates[1002] = { lat: 37.9755, lng: 23.7348 };
+            localStorage.setItem('therapistCoordinates', JSON.stringify(coordinates));
+            
+            log(`✅ Simulated registration completed. Total registered: ${registeredTherapists.length}`);
+            
+            // Test integration
+            testIntegration();
+        }
+        
+        // Populate test cards
+        function populateTestCards() {
+            log('🃏 Populating test cards...');
+            
+            const container = document.getElementById('testCardsContainer');
+            container.innerHTML = '';
+            
+            if (!window.therapistData || window.therapistData.length === 0) {
+                container.innerHTML = '<div class="col-span-full text-center text-gray-500">No therapist data available</div>';
+                log('❌ No therapist data to display');
+                return;
+            }
+            
+            log(`📊 Displaying ${window.therapistData.length} therapists`);
+            
+            // Show first 6 therapists
+            const therapistsToShow = window.therapistData.slice(0, 6);
+            
+            therapistsToShow.forEach(therapist => {
+                const card = document.createElement('div');
+                card.className = 'bg-white border rounded-lg p-4 shadow-sm';
+                
+                card.innerHTML = `
+                    <div class="text-center">
+                        <div class="w-16 h-16 bg-blue-500 rounded-full mx-auto mb-3 flex items-center justify-center text-white text-2xl">
+                            👨‍⚕️
+                        </div>
+                        <h3 class="font-semibold text-gray-800">Dr. ${therapist.first_name} ${therapist.last_name}</h3>
+                        <p class="text-sm text-blue-600">${therapist.title}</p>
+                        <p class="text-sm text-gray-600">${therapist.area}, ${therapist.city}</p>
+                        <p class="text-xs text-gray-500 mt-2">ID: ${therapist.id}</p>
+                        <div class="mt-2 text-xs ${therapist.id >= 1000 ? 'text-green-600 font-semibold' : 'text-gray-500'}">
+                            ${therapist.id >= 1000 ? '🆕 From localStorage' : '📋 Static Data'}
+                        </div>
+                    </div>
+                `;
+                
+                container.appendChild(card);
+            });
+            
+            log(`✅ Displayed ${therapistsToShow.length} therapist cards`);
+        }
+        
+        // Initialize on page load
+        window.addEventListener('load', function() {
+            log('🚀 Debug tool loaded');
+            checkCurrentState();
+        });
+    </script>
+</body>
+</html> 

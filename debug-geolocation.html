@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Geolocation Debug Test</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            max-width: 800px; 
+            margin: 50px auto; 
+            padding: 20px; 
+        }
+        .test-button { 
+            background: #007bff; 
+            color: white; 
+            padding: 15px 30px; 
+            border: none; 
+            border-radius: 8px; 
+            font-size: 16px; 
+            cursor: pointer; 
+            margin: 10px 0;
+            display: block;
+            width: 100%;
+        }
+        .test-button:hover { background: #0056b3; }
+        .result { 
+            background: #f8f9fa; 
+            border: 1px solid #dee2e6; 
+            padding: 15px; 
+            margin: 10px 0; 
+            border-radius: 4px; 
+        }
+        .error { background: #f8d7da; border-color: #f5c6cb; color: #721c24; }
+        .success { background: #d4edda; border-color: #c3e6cb; color: #155724; }
+    </style>
+</head>
+<body>
+    <h1>🌍 Geolocation Debug Test</h1>
+    
+    <h2>Step 1: Basic Tests</h2>
+    <button class="test-button" onclick="testGeolocationSupport()">Test Geolocation Support</button>
+    <div id="support-result" class="result"></div>
+    
+    <button class="test-button" onclick="testHttpsContext()">Test HTTPS/Localhost Context</button>
+    <div id="context-result" class="result"></div>
+    
+    <h2>Step 2: Permission Tests</h2>
+    <button class="test-button" onclick="testGeolocationPermission()">Request Geolocation Permission</button>
+    <div id="permission-result" class="result"></div>
+    
+    <button class="test-button" onclick="testGeolocationWithTimeout()">Test with 5s Timeout</button>
+    <div id="timeout-result" class="result"></div>
+    
+    <h2>Step 3: Browser Console</h2>
+    <div class="result">
+        <strong>Instructions:</strong><br>
+        1. Open browser console (F12)<br>
+        2. Look for error messages<br>
+        3. Check if permission prompts appear<br>
+        4. Note any blocked requests
+    </div>
+    
+    <h2>Step 4: Manual Test</h2>
+    <button class="test-button" onclick="manualGeolocationTest()">Manual Geolocation Test (Same as Therapy App)</button>
+    <div id="manual-result" class="result"></div>
+
+    <script>
+        console.log('🌍 Geolocation Debug Script Loaded');
+        
+        function testGeolocationSupport() {
+            const result = document.getElementById('support-result');
+            
+            if ('geolocation' in navigator) {
+                result.innerHTML = '✅ <strong>SUCCESS:</strong> Geolocation is supported in this browser';
+                result.className = 'result success';
+                console.log('✅ Geolocation supported');
+            } else {
+                result.innerHTML = '❌ <strong>ERROR:</strong> Geolocation is not supported in this browser';
+                result.className = 'result error';
+                console.error('❌ Geolocation not supported');
+            }
+        }
+        
+        function testHttpsContext() {
+            const result = document.getElementById('context-result');
+            const protocol = window.location.protocol;
+            const hostname = window.location.hostname;
+            
+            if (protocol === 'https:' || hostname === 'localhost' || hostname === '127.0.0.1') {
+                result.innerHTML = `✅ <strong>SUCCESS:</strong> Secure context (${protocol}//${hostname})`;
+                result.className = 'result success';
+                console.log(`✅ Secure context: ${protocol}//${hostname}`);
+            } else {
+                result.innerHTML = `❌ <strong>ERROR:</strong> Insecure context (${protocol}//${hostname}) - Geolocation requires HTTPS or localhost`;
+                result.className = 'result error';
+                console.error(`❌ Insecure context: ${protocol}//${hostname}`);
+            }
+        }
+        
+        function testGeolocationPermission() {
+            const result = document.getElementById('permission-result');
+            result.innerHTML = '⏳ Requesting geolocation permission...';
+            result.className = 'result';
+            
+            console.log('🌍 Testing geolocation permission request...');
+            
+            if (!navigator.geolocation) {
+                result.innerHTML = '❌ <strong>ERROR:</strong> Geolocation not supported';
+                result.className = 'result error';
+                return;
+            }
+            
+            navigator.geolocation.getCurrentPosition(
+                function(position) {
+                    const lat = position.coords.latitude;
+                    const lng = position.coords.longitude;
+                    result.innerHTML = `✅ <strong>SUCCESS:</strong> Location obtained!<br>Latitude: ${lat}<br>Longitude: ${lng}`;
+                    result.className = 'result success';
+                    console.log(`✅ Location: ${lat}, ${lng}`);
+                },
+                function(error) {
+                    let errorMsg = 'Unknown error';
+                    switch(error.code) {
+                        case error.PERMISSION_DENIED:
+                            errorMsg = 'Permission denied by user';
+                            break;
+                        case error.POSITION_UNAVAILABLE:
+                            errorMsg = 'Position unavailable';
+                            break;
+                        case error.TIMEOUT:
+                            errorMsg = 'Request timeout';
+                            break;
+                    }
+                    result.innerHTML = `❌ <strong>ERROR:</strong> ${errorMsg}<br>Error code: ${error.code}`;
+                    result.className = 'result error';
+                    console.error(`❌ Geolocation error: ${errorMsg}`, error);
+                },
+                {
+                    enableHighAccuracy: true,
+                    timeout: 10000,
+                    maximumAge: 0
+                }
+            );
+        }
+        
+        function testGeolocationWithTimeout() {
+            const result = document.getElementById('timeout-result');
+            result.innerHTML = '⏳ Testing with 5 second timeout...';
+            result.className = 'result';
+            
+            navigator.geolocation.getCurrentPosition(
+                function(position) {
+                    result.innerHTML = `✅ <strong>SUCCESS:</strong> Quick response received`;
+                    result.className = 'result success';
+                },
+                function(error) {
+                    result.innerHTML = `❌ <strong>ERROR:</strong> Timeout or other error (Code: ${error.code})`;
+                    result.className = 'result error';
+                },
+                {
+                    enableHighAccuracy: false,
+                    timeout: 5000,
+                    maximumAge: 300000
+                }
+            );
+        }
+        
+        function manualGeolocationTest() {
+            const result = document.getElementById('manual-result');
+            result.innerHTML = '⏳ Running same code as therapy app...';
+            result.className = 'result';
+            
+            // This is the exact same code structure as the therapy app
+            if (navigator.geolocation) {
+                console.log('🌍 Manual test - requesting geolocation...');
+                
+                navigator.geolocation.getCurrentPosition(
+                    function(position) {
+                        const userLat = position.coords.latitude;
+                        const userLng = position.coords.longitude;
+                        
+                        console.log(`✅ Manual test success: ${userLat}, ${userLng}`);
+                        
+                        result.innerHTML = `✅ <strong>SUCCESS:</strong> Therapy app code works!<br>Location: ${userLat}, ${userLng}`;
+                        result.className = 'result success';
+                    },
+                    function(error) {
+                        console.error('❌ Manual test error:', error);
+                        
+                        let errorMsg = 'Location access denied';
+                        switch(error.code) {
+                            case error.PERMISSION_DENIED:
+                                errorMsg = 'Location access denied';
+                                break;
+                            case error.POSITION_UNAVAILABLE:
+                                errorMsg = 'Location unavailable';
+                                break;
+                            case error.TIMEOUT:
+                                errorMsg = 'Location request timed out';
+                                break;
+                        }
+                        
+                        result.innerHTML = `❌ <strong>ERROR:</strong> ${errorMsg}<br>This is the same error the therapy app would show`;
+                        result.className = 'result error';
+                    },
+                    {
+                        enableHighAccuracy: true,
+                        timeout: 10000,
+                        maximumAge: 300000
+                    }
+                );
+            } else {
+                result.innerHTML = '❌ <strong>ERROR:</strong> Geolocation not supported';
+                result.className = 'result error';
+            }
+        }
+        
+        // Auto-run basic tests
+        window.addEventListener('load', function() {
+            testGeolocationSupport();
+            testHttpsContext();
+        });
+    </script>
+</body>
+</html>

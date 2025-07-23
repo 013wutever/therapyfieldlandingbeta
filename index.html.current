@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title data-translate-key="page.title">Therapy Field - Ψυχοθεραπεία Online & Δια Ζώσης | Βρείτε Ψυχοθεραπευτή στην Ελλάδα</title>
+    <meta name="description" data-translate-key="page.description" content="Το Therapy Field προσφέρει εύκολη και αξιόπιστη ψυχοθεραπεία online και δια ζώσης. Βρείτε τον κατάλληλο ψυχοθεραπευτή, αξιοποιήστε τις πλατφόρμες μας και βελτιώστε την ψυχική σας υγεία.">
+    <meta name="keywords" data-translate-key="page.keywords" content="ψυχοθεραπεία, ψυχολόγος, online ψυχοθεραπεία, Therapy Field, Ελλάδα, ψυχική υγεία, εύρεση ψυχοθεραπευτή, συνεδρίες, πλατφόρμα ψυχοθεραπείας, δια ζώσης, συμβουλευτική, αξιολόγηση, Therapy Field Plus">
+    <meta property="og:title" data-translate-key="og.title" content="Therapy Field - Ψυχοθεραπεία Online & Δια Ζώσης">
+    <meta property="og:description" data-translate-key="og.description" content="Βρείτε τον κατάλληλο ψυχοθεραπευτή online ή δια ζώσης στην Ελλάδα μέσω του Therapy Field. Εύκολη αναζήτηση, αξιόπιστοι επαγγελματίες, σύγχρονες πλατφόρμες.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://therapyfield.gr/">
+    <meta property="og:image" content="https://therapyfield.gr/Landing%20Page%20Media/Images/carefreewoman.png">
+    <link rel="canonical" href="https://therapyfield.gr/" />
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "name": "Therapy Field",
+      "url": "https://therapyfield.gr/",
+      "logo": "https://therapyfield.gr/Landing%20Page%20Media/Images/carefreewoman.png",
+      "contactPoint": [{
+        "@type": "ContactPoint",
+        "email": "contact.therapyfield@gmail.com",
+        "telephone": "+30 697 462 6408",
+        "contactType": "customer support",
+        "areaServed": "GR"
+      }],
+      "sameAs": [
+        "https://www.facebook.com/therapyfield",
+        "https://www.instagram.com/therapyfield",
+        "https://www.linkedin.com/company/therapyfield"
+      ]
+    }
+    </script>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="tablet-styles-override.css">
+    <link rel="stylesheet" href="hotfix.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Icons&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Lato:400,400i,700" rel="stylesheet">
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="navbar-section logo" data-translate-key="nav.logo">Therapy Field</div>
+        <div class="navbar-section nav-links">
+            <!-- Mobile Language Switcher -->
+            <div id="language-switcher-mobile" class="language-switcher">
+                <ul>
+                    <li lang-selection="EL" tooltip="ΕΛ" flow="down">
+                        <img src="https://cdn.countryflags.com/thumbs/greece/flag-800.png" alt="Greek Flag">
+                    </li>
+                    <li lang-selection="EN" tooltip="EN" flow="down">
+                        <img src="https://cdn.countryflags.com/thumbs/united-kingdom/flag-800.png" alt="UK Flag">
+                    </li>
+                </ul>
+            </div>
+            <a href="#about" data-translate-key="nav.about">Σχετικά με εμάς</a>
+            <a href="#services" data-translate-key="nav.services">Υπηρεσίες</a>
+            <a href="#platforms" data-translate-key="nav.platforms">Πλατφόρμες</a>
+            
+            <!-- Mobile buttons that will appear ONLY in hamburger menu -->
+            <div class="mobile-nav-buttons">
+                <a href="auth-modern.html" style="display: contents;">
+                    <button class="btn secondary" type="button">
+                        <span data-translate-key="nav.login">Σύνδεση</span>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="8" viewBox="0 0 16 8" fill="none">
+                            <path d="M14.9919 4.35355C15.1872 4.15829 15.1872 3.84171 14.9919 3.64645L11.8099 0.464466C11.6147 0.269204 11.2981 0.269204 11.1028 0.464466C10.9076 0.659728 10.9076 0.976311 11.1028 1.17157L13.9312 4L11.1028 6.82843C10.9076 7.02369 10.9076 7.34027 11.1028 7.53553C11.2981 7.7308 11.6147 7.7308 11.8099 7.53553L14.9919 4.35355ZM0 4V4.5H14.6383V4V3.5H0V4Z" fill="black"/>
+                        </svg>
+                    </button>
+                </a>
+                <button class="btn primary">
+                    <span data-translate-key="nav.schedule">Προγραμματισμός Θεραπείας</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="8" viewBox="0 0 16 8" fill="none">
+                        <path d="M14.9919 4.35355C15.1872 4.15829 15.1872 3.84171 14.9919 3.64645L11.8099 0.464466C11.6147 0.269204 11.2981 0.269204 11.1028 0.464466C10.9076 0.659728 10.9076 0.976311 11.1028 1.17157L13.9312 4L11.1028 6.82843C10.9076 7.02369 10.9076 7.34027 11.1028 7.53553C11.2981 7.7308 11.6147 7.7308 11.8099 7.53553L14.9919 4.35355ZM0 4V4.5H14.6383V4V3.5H0V4Z" fill="white"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <div class="navbar-section nav-buttons">
+            <a href="auth-modern.html" style="display: contents;">
+                <button class="btn secondary" type="button">
+                    <span data-translate-key="nav.login">Σύνδεση</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="8" viewBox="0 0 16 8" fill="none">
+                        <path d="M14.9919 4.35355C15.1872 4.15829 15.1872 3.84171 14.9919 3.64645L11.8099 0.464466C11.6147 0.269204 11.2981 0.269204 11.1028 0.464466C10.9076 0.659728 10.9076 0.976311 11.1028 1.17157L13.9312 4L11.1028 6.82843C10.9076 7.02369 10.9076 7.34027 11.1028 7.53553C11.2981 7.7308 11.6147 7.7308 11.8099 7.53553L14.9919 4.35355ZM0 4V4.5H14.6383V4V3.5H0V4Z" fill="black"/>
+                    </svg>
+                </button>
+            </a>
+            <button class="btn primary">
+                <span data-translate-key="nav.schedule">Προγραμματισμός Θεραπείας</span>
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="8" viewBox="0 0 16 8" fill="none">
+                    <path d="M14.9919 4.35355C15.1872 4.15829 15.1872 3.84171 14.9919 3.64645L11.8099 0.464466C11.6147 0.269204 11.2981 0.269204 11.1028 0.464466C10.9076 0.659728 10.9076 0.976311 11.1028 1.17157L13.9312 4L11.1028 6.82843C10.9076 7.02369 10.9076 7.34027 11.1028 7.53553C11.2981 7.7308 11.6147 7.7308 11.8099 7.53553L14.9919 4.35355ZM0 4V4.5H14.6383V4V3.5H0V4Z" fill="white"/>
+                </svg>
+            </button>
+            <!-- Desktop Language Switcher -->
+            <div id="language-switcher-desktop" class="language-switcher">
+                <ul>
+                    <li lang-selection="EL" tooltip="ΕΛ" flow="down">
+                        <img src="https://cdn.countryflags.com/thumbs/greece/flag-800.png" alt="Greek Flag">
+                    </li>
+                    <li lang-selection="EN" tooltip="EN" flow="down">
+                        <img src="https://cdn.countryflags.com/thumbs/united-kingdom/flag-800.png" alt="UK Flag">
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <div class="hamburger">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+    </nav>
+
+    <main>
+        <section class="hero" id="about">
+            <h1 data-translate-key="hero.title">
+                Μικρά βήματα, μεγάλη αλλαγή.<br>
+                Η <span class="highlight">ψυχοθεραπεία</span> ξεκινά με ένα ραντεβού.
+            </h1>
+            <button class="btn primary hero-mobile-cta">
+                <span data-translate-key="hero.mobileCta.text">Προγραμματισμός Θεραπείας</span>
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="8" viewBox="0 0 16 8" fill="none">
+                    <path d="M14.9919 4.35355C15.1872 4.15829 15.1872 3.84171 14.9919 3.64645L11.8099 0.464466C11.6147 0.269204 11.2981 0.269204 11.1028 0.464466C10.9076 0.659728 10.9076 0.976311 11.1028 1.17157L13.9312 4L11.1028 6.82843C10.9076 7.02369 10.9076 7.34027 11.1028 7.53553C11.2981 7.7308 11.6147 7.7308 11.8099 7.53553L14.9919 4.35355ZM0 4V4.5H14.6383V4V3.5H0V4Z" fill="white"/>
+                </svg>
+            </button>
+            <div class="video-wrapper">
+                <div class="video-bg-container"></div>
+                <div class="video-container">
+                    <video id="heroVideo" autoplay muted playsinline></video>
+                    <img id="heroVideoFallback" src="Landing Page Media/Images/lowbatterymode-hero.png" alt="Hero fallback" style="display:none;width:100%;height:100%;object-fit:cover;border-radius:15px;" />
+                    <div class="video-label" id="videoLabel" data-translate-key="hero.videoLabel">Δια ζώσης Θεραπεία</div>
+                    <div class="find-therapist-btn-puzzle">
+                        <div class="btn-text" data-translate-key="hero.findTherapist">Βρείτε Θεραπευτή</div>
+                        <div class="btn-arrow">↓</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="services-section" id="services">
+            <!-- SVG backgrounds for desktop and mobile -->
+            <div class="services-bg-svg">
+                <!-- Desktop SVG -->
+                <svg class="services-bg-desktop" xmlns="http://www.w3.org/2000/svg" width="1440" height="815" viewBox="0 0 1440 815" fill="none" preserveAspectRatio="none">
+                  <foreignObject x="-49.2" y="-49.2" width="1538.4" height="913.4"><div xmlns="http://www.w3.org/1999/xhtml" style="backdrop-filter:blur(24.6px);clip-path:url(#bgblur_0_227_1017_clip_path);height:100%;width:100%"></div></foreignObject><g data-figma-bg-blur-radius="49.2">
+                    <path d="M0 431.67V20C0 8.9543 8.95431 0 20 0H664C675.046 0 684 8.9543 684 20V281.637C684 292.683 692.954 301.637 704 301.637H1420C1431.05 301.637 1440 310.591 1440 321.637V381.88V795C1440 806.046 1431.05 815 1420 815H20C8.95432 815 0 806.046 0 795V431.67Z" fill="#ADC3FF" fill-opacity="0.28"/>
+                    <path d="M20 0.5H664C674.77 0.5 683.5 9.23045 683.5 20V281.637C683.5 292.959 692.678 302.137 704 302.137H1420C1430.77 302.137 1439.5 310.867 1439.5 321.637V795C1439.5 805.77 1430.77 814.5 1420 814.5H20C9.23045 814.5 0.5 805.77 0.5 795V20C0.5 9.23045 9.23045 0.5 20 0.5Z" stroke="#CFCFCF" stroke-opacity="0.08" stroke-width="0.5"/>
+                  </g>
+                  <defs>
+                    <clipPath id="bgblur_0_227_1017_clip_path" transform="translate(49.2 49.2)"><path d="M0 431.67V20C0 8.9543 8.95431 0 20 0H664C675.046 0 684 8.9543 684 20V281.637C684 292.683 692.954 301.637 704 301.637H1420C1431.05 301.637 1440 310.591 1440 321.637V381.88V795C1440 806.046 1431.05 815 1420 815H20C8.95432 815 0 806.046 0 795V431.67Z"/>
+                  </clipPath></defs>
+                </svg>
+                <!-- Mobile SVG -->
+                <svg class="services-bg-mobile" xmlns="http://www.w3.org/2000/svg" width="360" height="520" viewBox="0 0 360 520" fill="none" preserveAspectRatio="none">
+                  <foreignObject x="-49.2" y="-49.2" width="458.4" height="618.4"><div xmlns="http://www.w3.org/1999/xhtml" style="backdrop-filter:blur(24.6px);clip-path:url(#bgblur_0_260_1324_clip_path);height:100%;width:100%"></div></foreignObject><g data-figma-bg-blur-radius="49.2">
+                    <path d="M0 258.489V20C0 8.95432 8.95431 0 20 0H59.5C70.5457 0 79.5 8.95431 79.5 20V105.5C79.5 116.546 88.4543 125.5 99.5 125.5H340C351.046 125.5 360 134.454 360 145.5V169.779V224.522V500C360 511.046 351.046 520 340 520H20C8.95431 520 0 511.046 0 500V258.489Z" fill="#11296B" fill-opacity="0.18"/>
+                    <path d="M20 0.5H59.5C70.2696 0.5 79 9.23045 79 20V105.5C79 116.822 88.1782 126 99.5 126H340C350.77 126 359.5 134.73 359.5 145.5V500C359.5 510.77 350.77 519.5 340 519.5H20C9.23045 519.5 0.5 510.77 0.5 500V20C0.500005 9.23045 9.23045 0.500001 20 0.5Z" stroke="#CFCFCF" stroke-opacity="0.08" stroke-width="0.5"/>
+                  </g>
+                  <defs>
+                    <clipPath id="bgblur_0_260_1324_clip_path" transform="translate(49.2 49.2)"><path d="M0 258.489V20C0 8.95432 8.95431 0 20 0H59.5C70.5457 0 79.5 8.95431 79.5 20V105.5C79.5 116.546 88.4543 125.5 99.5 125.5H340C351.046 125.5 360 134.454 360 145.5V169.779V224.522V500C360 511.046 351.046 520 340 520H20C8.95431 520 0 511.046 0 500V258.489Z"/>
+                  </clipPath></defs>
+                </svg>
+            </div>
+            <div class="services-bg-woman"><img src="Landing Page Media/Images/happy-woman-therapy-field.png" alt="Χαμογελαστή γυναίκα Therapy Field" /></div>
+            
+            <!-- Add curved background for mobile view -->
+            <div class="curved-bg"></div>
+
+            <div class="services-header">
+                <h2 data-translate-key="services.title">
+                    Η επιλογή της υπηρεσίας ψυχικής υγείας που σας ταιριάζει,<br>
+                    <span class="highlight">ευκολότερα.</span>
+                </h2>
+            </div>
+
+            <div class="services-grid">
+                <a class="service-card-link" href="#" aria-label="Δια Ζώσης Ψυχοθεραπεία">
+                  <div class="service-card">
+                    <div class="service-card-content">
+                        <h3 class="service-card-title" data-translate-key="serviceCard.inPerson.title1">Δια Ζώσης</h3>
+                        <h3 class="service-card-title" data-translate-key="serviceCard.inPerson.title2">Ψυχοθεραπεία</h3>
+                        <p class="service-card-desc" data-translate-key="serviceCard.inPerson.desc">Εύρεση ψυχοθεραπευτή κοντά σας</p>
+                    </div>
+                    <div class="service-card-image-wrapper">
+                        <picture>
+                          <source srcset="Landing Page Media/Images/mobileservice1.png" media="(max-width: 768px)">
+                          <img class="service-card-image" src="Landing Page Media/Images/mobileservice1.png" alt="Δια ζώσης ψυχοθεραπεία εικονίδιο">
+                        </picture>
+                    </div>
+                    <button class="service-card-btn" data-translate-key="serviceCard.button">Επιλογή</button>
+                  </div>
+                </a>
+                <a class="service-card-link" href="#" aria-label="Online Ψυχοθεραπεία">
+                  <div class="service-card">
+                    <div class="service-card-content">
+                        <h3 class="service-card-title" data-translate-key="serviceCard.online.title1">Online</h3>
+                        <h3 class="service-card-title" data-translate-key="serviceCard.online.title2">Ψυχοθεραπεία</h3>
+                        <p class="service-card-desc" data-translate-key="serviceCard.online.desc">Άμεση σύνδεση από το σπίτι σας</p>
+                    </div>
+                    <div class="service-card-image-wrapper">
+                        <picture>
+                          <source srcset="Landing Page Media/Images/mobileservice2.png" media="(max-width: 768px)">
+                          <img class="service-card-image" src="Landing Page Media/Images/mobileservice2.png" alt="Online ψυχοθεραπεία εικονίδιο">
+                        </picture>
+                    </div>
+                    <button class="service-card-btn" data-translate-key="serviceCard.button">Επιλογή</button>
+                  </div>
+                </a>
+                <a class="service-card-link" href="#" aria-label="Ψυχομετρική Αξιολόγηση">
+                  <div class="service-card">
+                    <div class="service-card-content">
+                        <h3 class="service-card-title" data-translate-key="serviceCard.assessment.title1">Ψυχομετρική</h3>
+                        <h3 class="service-card-title" data-translate-key="serviceCard.assessment.title2">Αξιολόγηση</h3>
+                        <p class="service-card-desc" data-translate-key="serviceCard.assessment.desc">Αξιολογήσεις από έμπειρους ψυχολόγους</p>
+                    </div>
+                    <div class="service-card-image-wrapper">
+                        <picture>
+                          <source srcset="Landing Page Media/Images/mobileservice3.png" media="(max-width: 768px)">
+                          <img class="service-card-image" src="Landing Page Media/Images/mobileservice3.png" alt="Ψυχομετρική αξιολόγηση εικονίδιο">
+                        </picture>
+                    </div>
+                    <button class="service-card-btn" data-translate-key="serviceCard.button">Επιλογή</button>
+                  </div>
+                </a>
+                <a class="service-card-link" href="#" aria-label="Συμβουλευτική Εφήβων και Γονέων">
+                  <div class="service-card">
+                    <div class="service-card-content">
+                        <h3 class="service-card-title" data-translate-key="serviceCard.counseling.title1">Συμβουλευτική</h3>
+                        <h3 class="service-card-title" data-translate-key="serviceCard.counseling.title2">Εφήβων και Γονέων</h3>
+                        <p class="service-card-desc" data-translate-key="serviceCard.counseling.desc">Συμβουλευτική από ειδικούς</p>
+                    </div>
+                    <div class="service-card-image-wrapper">
+                        <picture>
+                          <source srcset="Landing Page Media/Images/mobileservice4.png" media="(max-width: 768px)">
+                          <img class="service-card-image" src="Landing Page Media/Images/mobileservice4.png" alt="Συμβουλευτική εφήβων και γονέων εικονίδιο">
+                        </picture>
+                    </div>
+                    <button class="service-card-btn" data-translate-key="serviceCard.button">Επιλογή</button>
+                  </div>
+                </a>
+            </div>
+        </section>
+        <!-- New Section: Quick Therapist Selection -->
+        <section class="quick-selection-section">
+            <div class="quick-selection-container">
+                <div class="quick-selection-video">
+                    <video id="quickSelectionVideo" src="Landing Page Media/Videos/therapist-selection-demo.mp4" autoplay muted loop playsinline style="width:100%;max-width:500px;border-radius:24px;margin-top:80px;"></video>
+                    <img id="quickSelectionVideoFallback" src="Landing Page Media/Images/lowbatterymode-2.png" alt="Therapist selection fallback" style="display:none;width:100%;max-width:500px;border-radius:24px;margin-top:80px;object-fit:cover;" />
+                </div>
+                <div class="quick-selection-info">
+                    <div class="quick-selection-info-inner">
+                        <h3 data-translate-key="quickSelection.title">Άμεση και γρήγορη επιλογή ψυχοθεραπευτή</h3>
+                        <p data-translate-key="quickSelection.subtitle">Χρησιμοποιώντας τα φίλτρα και κριτήρια της επιλογής σας</p>
+                        <div class="quick-selection-icons">
+                            <span class="icon-btn"><img src="Landing Page Media/Images/filter-icon-1.png" alt="Εικονίδιο φίλτρου 1"></span>
+                            <span class="icon-btn"><img src="Landing Page Media/Images/filter-icon-2.png" alt="Εικονίδιο φίλτρου 2"></span>
+                            <span class="icon-btn"><img src="Landing Page Media/Images/filter-icon-3.png" alt="Εικονίδιο φίλτρου 3"></span>
+                            <span class="icon-btn"><img src="Landing Page Media/Images/filter-icon-4.png" alt="Εικονίδιο φίλτρου 4"></span>
+                            <span class="icon-btn"><img src="Landing Page Media/Images/filter-icon-5.png" alt="Εικονίδιο φίλτρου 5"></span>
+                        </div>
+                        <button class="btn quick-selection-cta" data-translate-key="quickSelection.cta">Ξεκινήστε τώρα <span style="font-size:18px;">→</span></button>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- End New Section -->
+        <!-- New Section: Section 4 with background image -->
+        <section class="section4" style="background: url('Landing Page Media/Images/therapy-section-background.jpg') no-repeat center center/cover;">
+            <div class="section4-overlay">
+                <div class="section4-content">
+                    <div class="section4-title-block">
+                        <h2 class="section4-title" data-translate-key="section4.title">Αξιόπιστοι Επαγγελματίες Ψυχικής Υγείας</h2>
+                        <div class="section4-subtitle" data-translate-key="section4.subtitle">Στο Therapy Field συνεργαζόμαστε αποκλειστικά με αδειοδοτημένους ψυχολόγους και ψυχοθεραπευτές που έχουν περάσει από αυστηρή διαδικασία αξιολόγησης και επιλογής. Εξασφαλίζουμε ότι κάθε επαγγελματίας πληροί υψηλά επιστημονικά και ηθικά πρότυπα, ώστε να μπορεί να παρέχει ποιοτική ψυχοθεραπεία και εξειδικευμένες υπηρεσίες ψυχικής υγείας.</div>
+                    </div>
+                    <div class="section4-extra" data-translate-key="section4.extra">Με τη βοήθεια του συστήματος ταιριάσματος του Therapy Field, σας καθοδηγούμε ώστε να βρείτε τον κατάλληλο θεραπευτή σύμφωνα με τις προσωπικές σας ανάγκες, τις προτιμήσεις και τους στόχους σας.</div>
+                    <button class="section4-mobile-btn" data-translate-key="section4.cta">Βρείτε Θεραπευτή <span style="font-size:22px;">→</span></button>
+                </div>
+            </div>
+        </section>
+        <!-- End Section 4 -->
+        <!-- Section 5 - Therapy Field + with 5x3 Grid Layout -->
+        <section class="section5" id="platforms">
+            <div class="section5-container">
+                <div class="section5-header">
+                    <p class="section5-title" data-translate-key="section5.header.title">
+                        Μόλις βρείτε τον κατάλληλο ψυχοθεραπευτή, αξιοποιήστε τις<br>
+                        πλατφόρμες μας για περισσότερο έλεγχο της ψυχικής σας υγείας
+                    </p>
+                    <h2 class="section5-brand" data-translate-key="section5.header.brand">Therapy Field +</h2>
+                </div>
+                <!-- Desktop grid (visible on desktop only) -->
+                <div class="section5-grid section5-grid-desktop">
+                  <!-- Column 1 -->
+                  <div class="grid-image col1" style="background-image: url('Landing Page Media/Images/platform-goal-tracking.jpg');"></div>
+                  <div class="grid-text col1" data-translate-key="section5.grid.col1.text">
+                    Θέσε μικρούς στόχους,<br>
+                    παρακολούθησε την πρόοδό<br>
+                    σου και μείνε συνεπής στην<br>
+                    προσωπική σου ανάπτυξη.
+                  </div>
+                  <!-- Column 2 -->
+                  <div class="grid-text col2" data-translate-key="section5.grid.col2.text">
+                    Διαμόρφωσε το πρόγραμμα<br>
+                    συνεδριών σου, όπως εσύ<br>
+                    επιθυμείς.
+                  </div>
+                  <div class="grid-image col2" style="background-image: url('Landing Page Media/Images/platform-schedule.jpg');"></div>
+                  <!-- Column 3 -->
+                  <div class="grid-image col3" style="background-image: url('Landing Page Media/Images/platform-journaling.jpg');"></div>
+                  <div class="grid-text col3" data-translate-key="section5.grid.col3.text">
+                    Οργάνωσε τις σκέψεις σου,<br>
+                    κατανόησε τον εαυτό σου,<br>
+                    εξέφρασε όσα δεν λες.
+                  </div>
+                  <!-- Column 4 -->
+                  <div class="grid-text col4" data-translate-key="section5.grid.col4.text">
+                    Παρακολούθησε πώς νιώθεις<br>
+                    καθημερινά και αναγνώρισε<br>
+                    μοτίβα στη διάθεσή σου.
+                  </div>
+                  <div class="grid-image col4" style="background-image: url('Landing Page Media/Images/platform-mood-tracking.jpg');"></div>
+                  <!-- Column 5 -->
+                  <div class="grid-image col5" style="background-image: url('Landing Page Media/Images/platform-unlock-tools.jpg');"></div>
+                  <div class="grid-text col5" data-translate-key="section5.grid.col5.text">
+                    Ξεκλείδωσε όλα τα εργαλεία<br>
+                    χωρίς περιορισμούς. Επένδυσε<br>
+                    στην ψυχική σου φροντίδα.
+                  </div>
+                </div>
+                <!-- Mobile/Tablet cards (visible on mobile/tablet only) -->
+                <div class="section5-grid section5-grid-mobile">
+                  <!-- Card 1 -->
+                  <div class="section5-card" style="background-image: url('Landing Page Media/Images/platform-goal-tracking.jpg');">
+                    <div class="section5-card-text" data-translate-key="section5.grid.col1.text">
+                      Θέσε μικρούς στόχους,<br>
+                      παρακολούθησε την πρόοδό<br>
+                      σου και μείνε συνεπής στην<br>
+                      προσωπική σου ανάπτυξη.
+                    </div>
+                  </div>
+                  <!-- Card 2 -->
+                  <div class="section5-card" style="background-image: url('Landing Page Media/Images/platform-schedule.jpg');">
+                    <div class="section5-card-text" data-translate-key="section5.grid.col2.text">
+                      Διαμόρφωσε το πρόγραμμα<br>
+                      συνεδριών σου, όπως εσύ<br>
+                      επιθυμείς.
+                    </div>
+                  </div>
+                  <!-- Card 3 -->
+                  <div class="section5-card" style="background-image: url('Landing Page Media/Images/platform-journaling.jpg');">
+                    <div class="section5-card-text" data-translate-key="section5.grid.col3.text">
+                      Οργάνωσε τις σκέψεις σου,<br>
+                      κατανόησε τον εαυτό σου,<br>
+                      εξέφρασε όσα δεν λες.
+                    </div>
+                  </div>
+                  <!-- Card 4 -->
+                  <div class="section5-card" style="background-image: url('Landing Page Media/Images/platform-mood-tracking.jpg');">
+                    <div class="section5-card-text" data-translate-key="section5.grid.col4.text">
+                      Παρακολούθησε πώς νιώθεις<br>
+                      καθημερινά και αναγνώρισε<br>
+                      μοτίβα στη διάθεσή σου.
+                    </div>
+                  </div>
+                  <!-- Card 5 -->
+                  <div class="section5-card" style="background-image: url('Landing Page Media/Images/platform-unlock-tools.jpg');">
+                    <div class="section5-card-text" data-translate-key="section5.grid.col5.text">
+                      Ξεκλείδωσε όλα τα εργαλεία<br>
+                      χωρίς περιορισμούς. Επένδυσε<br>
+                      στην ψυχική σου φροντίδα.
+                    </div>
+                  </div>
+                </div>
+                <button class="section5-platforms-btn" data-translate-key="section5.cta">
+                    Σύνδεση στις Πλατφόρμες
+                    <span style="font-size: 22px; margin-left: 12px;">→</span>
+                </button>
+            </div>
+        </section>
+        <!-- Section 6 - Therapy CTA Section -->
+        <section class="section6">
+            <div class="section6-container">
+                <!-- Left side - 2x2 grid of images -->
+                <div class="section6-left">
+                    <div class="section6-images">
+                        <img src="Landing Page Media/Images/section6-woman-stressed.jpg" alt="Γυναίκα με άγχος">
+                        <img src="Landing Page Media/Images/section6-woman-working.jpg" alt="Γυναίκα που εργάζεται">
+                        <img src="Landing Page Media/Images/section6-man-thinking.jpg" alt="Άνδρας που σκέφτεται">
+                        <img src="Landing Page Media/Images/section6-therapy-session.jpg" alt="Συνεδρία ψυχοθεραπείας">
+                    </div>
+                </div>
+                <!-- Right side - Content -->
+                <div class="section6-right">
+                    <div class="section6-content">
+                        <h2 class="section6-title" data-translate-key="section6.title">
+                            Ξεκίνα Ψυχοθεραπεία, για να νιώσεις<br>
+                            καλύτερα!
+                        </h2>
+                        <p class="section6-description" data-translate-key="section6.description">
+                            Άγχος, καταθλιπτικό συναίσθημα, κρίσεις πανικού,<br>
+                            δυσκολίες διαχείρισης συναισθήματος, χαμηλή διάθεση,<br>
+                            προβλήματα με τους σημαντικούς άλλους;
+                        </p>
+                        <p class="section6-subtitle" data-translate-key="section6.subtitle">
+                            Δε χρειάζεται να νιώθεις έτσι! Έρευνες αποδεικνείουν τα<br>
+                            οφέλη της ψυχοθεραπείας!
+                        </p>
+                        <!-- Graph/Chart -->
+                        <div class="section6-graph">
+                            <img src="Landing Page Media/Images/therapy-progress-graph.jpg" alt="Γράφημα προόδου ψυχοθεραπείας">
+                        </div>
+                        <button class="section6-cta" data-translate-key="section6.cta">Ξεκίνα Ψυχοθεραπεία
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M5 12H19" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M12 5L19 12L12 19" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- Section 7 - FAQ -->
+        <section class="section7">
+            <div class="wrapper">
+                <h2 class="section7-title" data-translate-key="faq.title">Συχνές Ερωτήσεις</h2>
+                <!-- FAQ Item 1 -->
+                <div class="container">
+                    <div class="question" data-translate-key="faq.q1.question">Τι είναι η ψυχοθεραπεία;</div>
+                    <div class="answercont">
+                        <div class="answer" data-translate-key="faq.q1.answer">
+                            Η ψυχοθεραπεία είναι μια διαδικασία κατά την οποία ένα άτομο συνεργάζεται με έναν εξειδικευμένο επαγγελματία για να εξερευνήσει και να αντιμετωπίσει τα συναισθηματικά και ψυχολογικά του ζητήματα. Μέσω της συζήτησης και των θεραπευτικών τεχνικών, βοηθά στην κατανόηση και την επίλυση προβλημάτων, την ανάπτυξη νέων δεξιοτήτων και την επίτευξη προσωπικής ανάπτυξης.
+                        </div>
+                    </div>
+                </div>
+                <!-- FAQ Item 2 -->
+                <div class="container">
+                    <div class="question" data-translate-key="faq.q2.question">Πως μπορώ να ξέρω αν χρειάζεται να αρχίσω ψυχοθεραπεία;</div>
+                    <div class="answercont">
+                        <div class="answer" data-translate-key="faq.q2.answer">
+                            Εάν αισθάνεστε επίμονο άγχος, κατάθλιψη, δυσκολίες στις σχέσεις, έλλειψη νοήματος ή σκοπού, ή αν αντιμετωπίζετε δυσκολία στη διαχείριση των συναισθημάτων σας, η ψυχοθεραπεία είναι χρήσιμη. Είναι επίσης μια πολύτιμη διαδικασία για όσους επιθυμούν να κατανοήσουν καλύτερα τον εαυτό τους και να προωθήσουν την προσωπική τους ανάπτυξη.
+                        </div>
+                    </div>
+                </div>
+                <!-- FAQ Item 3 -->
+                <div class="container">
+                    <div class="question" data-translate-key="faq.q3.question">Είναι οι συζητήσεις με τον θεραπευτή εμπιστευτικές;</div>
+                    <div class="answercont">
+                        <div class="answer" data-translate-key="faq.q3.answer">
+                            Ναι, οι συζητήσεις με τον θεραπευτή είναι εμπιστευτικές. Οι θεραπευτές τηρούν αυστηρά την επαγγελματική δεοντολογία που προστατεύει την ιδιωτικότητα των πληροφοριών σας. Υπάρχουν μόνο λίγες εξαιρέσεις, όπως όταν υπάρχει κίνδυνος για τον εαυτό σας ή άλλους, που θα σας εξηγήσει ο θεραπευτής στην πρώτη συνεδρία.
+                        </div>
+                    </div>
+                </div>
+                <!-- FAQ Item 4 -->
+                <div class="container">
+                    <div class="question" data-translate-key="faq.q4.question">Πόσο διαρκεί και πόσο κοστίζει η ψυχοθεραπεία;</div>
+                    <div class="answercont">
+                        <div class="answer" data-translate-key="faq.q4.answer">
+                            Η διάρκεια της ψυχοθεραπείας εξαρτάται από τις ανάγκες και τους στόχους του κάθε ατόμου. Μπορεί να είναι βραχυπρόθεσμη, για να αντιμετωπιστεί ένα συγκεκριμένο ζήτημα, ή μακροπρόθεσμη, για να επιτευχθεί βαθύτερη κατανόηση και αλλαγή. Αυτό θα συζητηθεί και θα καθοριστεί από κοινού με τον θεραπευτή. Κάθε μεμονωμένη συνεδρία διαρκεί 45 λεπτά.<br><br>Το κόστος της ψυχοθεραπείας μπορεί να ποικίλει ανάλογα με το αίτημα του θεραπευόμενου που ορίζει τους στόχους της θεραπείας. Αυτό θα συζητηθεί κατά την πρώτη επικοινωνία με τον θεραπευτή.
+                        </div>
+                    </div>
+                </div>
+                <!-- FAQ Item 5 -->
+                <div class="container">
+                    <div class="question" data-translate-key="faq.q5.question">Ποιά η διαφορά του ψυχολόγου και του ψυχοθεραπευτή;</div>
+                    <div class="answercont">
+                        <div class="answer" data-translate-key="faq.q5.answer">
+                            Ψυχολόγος είναι επαγγελματίας ψυχικής υγείας που έχει ολοκληρώσει σπουδές στην επιστήμη της ψυχολογίας, η οποία μελετά τη συμπεριφορά, τις γνωστικές και συναισθηματικές διεργασίες του ανθρώπου. Ανάλογα με την εξειδίκευσή του, μπορεί να ασχοληθεί με τη διάγνωση και αξιολόγηση ψυχικών διαταραχών, την ψυχομετρική εκτίμηση, την έρευνα, την εκπαίδευση ή τη συμβουλευτική σε ποικίλα περιβάλλοντα (π.χ. σχολεία, οργανισμούς, δομές υγείας).<br><br>Ο Ψυχοθεραπευτής είναι  ψυχολόγος ή ψυχίατρος, που έχει λάβει επιπλέον εξειδικευμένη εκπαίδευση στην ψυχοθεραπεία. Παρέχει κλινική φροντίδα μέσω συστηματικών συνεδριών με στόχο τη μείωση των ψυχικών συμπτωμάτων και την αντιμετώπιση συναισθηματικών ή διαπροσωπικών δυσκολιών. Η ψυχοθεραπεία βασίζεται κυρίως στη θεραπευτική σχέση και τη συζήτηση ως μέσο ενδοσκόπησης, κατανόησης και ψυχικής αλλαγής. Οι ψυχοθεραπευτές εφαρμόζουν επιστημονικά τεκμηριωμένες μεθόδους (όπως ψυχοδυναμική, γνωσιακή, συστημική, κ.λπ.) και εργάζονται ατομικά ή με ζευγάρια/οικογένειες.
+                        </div>
+                    </div>
+                </div>
+                <!-- FAQ Item 6 -->
+                <div class="container">
+                    <div class="question" data-translate-key="faq.q6.question">Ποιές είναι οι διαφορές μεταξύ τύπων ψυχοθεραπείας;</div>
+                    <div class="answercont">
+                        <div class="answer" data-translate-key="faq.q6.answer">
+                            Υπάρχουν διάφορες προσεγγίσεις στην ψυχοθεραπεία, καθεμία με διαφορετικό τρόπο κατανόησης και αντιμετώπισης των ψυχικών δυσκολιών: Ψυχοδυναμική / Ψυχαναλυτική: Εστιάζει στο ασυνείδητο, τις πρώιμες εμπειρίες και τη θεραπευτική σχέση για βαθύτερη κατανόηση του εαυτού. Γνωσιακή-Συμπεριφορική (CBT): Εργάζεται με τις σκέψεις και τις συμπεριφορές, βοηθώντας στη διαχείριση συμπτωμάτων με πρακτικές τεχνικές. Συστημική: Εξετάζει τις σχέσεις (π.χ. οικογένεια, ζευγάρι) και στοχεύει στη βελτίωση της επικοινωνίας και της δυναμικής.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="brand-section">
+                <div class="footer-brand" data-translate-key="footer.brand">Therapy Field</div>
+                <div class="contact-section">
+                    <h4 data-translate-key="footer.contact.title">Επικοινωνία</h4>
+                    <div class="contact-buttons" role="group" aria-label="Contact information">
+                        <a href="mailto:contact.therapyfield@gmail.com" class="contact-button" aria-label="Send us an email">
+                            <i class="fa fa-envelope" aria-hidden="true"></i>
+                            contact.therapyfield@gmail.com
+                        </a>
+                        <a href="tel:+306974626408" class="contact-button" aria-label="Call us">
+                            <i class="fa fa-phone" aria-hidden="true"></i>
+                            +30 697 462 6408
+                        </a>
+                    </div>
+                </div>
+                <div class="locations-section">
+                    <h4 data-translate-key="footer.locations.title">Τοποθεσίες</h4>
+                    <div class="location-item" role="region" aria-label="Office location">
+                        <i class="fa fa-map-marker-alt" aria-hidden="true"></i>
+                        <div class="location-details">
+                            <p data-translate-key="footer.locations.location1.area">Χολαργός / Χαλάνδρι</p>
+                            <p data-translate-key="footer.locations.location1.address">Γυθείου 19, 152 31, Αθήνα</p>
+                        </div>
+                    </div>
+                    <div class="location-item">
+                        <i class="fa fa-map-marker-alt"></i>
+                        <div class="location-details">
+                            <p data-translate-key="footer.locations.location2.area">Νέα Μάκρη</p>
+                            <p data-translate-key="footer.locations.location2.address">Ρούμελης, 190 05, Αττική</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-section empty-space"></div>
+            <div class="footer-links-wrapper">
+                <div class="links-column">
+                    <h4 data-translate-key="footer.links.therapy.title">Περί Θεραπείας</h4>
+                    <ul>
+                        <li><a href="#" data-translate-key="footer.links.therapy.faq">Συχνές Ερωτήσεις</a></li>
+                        <li><a href="#" data-translate-key="footer.links.therapy.whatIs">Τι είναι η ψυχοθεραπεία;</a></li>
+                        <li><a href="#" data-translate-key="footer.links.therapy.firstSession">Πώς λειτουργεί η πρώτη συνεδρία;</a></li>
+                        <li><a href="#" data-translate-key="footer.links.therapy.types">Τύποι Ψυχοθεραπείας</a></li>
+                    </ul>
+                </div>
+                <div class="links-column">
+                    <h4 data-translate-key="footer.links.interest.title">Μπορεί να σας ενδιαφέρει</h4>
+                    <ul>
+                        <li><a href="#" data-translate-key="footer.links.interest.pricing">Τιμολόγηση</a></li>
+                        <li><a href="#" data-translate-key="footer.links.interest.plusSubscription">Συνδρομή Therapy Field+</a></li>
+                        <li><a href="#" data-translate-key="footer.links.interest.forProfessionals">Για Επαγγελματίες</a></li>
+                        <li><a href="#" data-translate-key="footer.links.interest.forCompanies">Για Εταιρείες</a></li>
+                    </ul>
+                </div>
+                <div class="links-column">
+                    <h4 data-translate-key="footer.links.legal.title">Νομικά</h4>
+                    <ul>
+                        <li><a href="#" data-translate-key="footer.links.legal.privacy">Πολιτική Απορρήτου</a></li>
+                        <li><a href="#" data-translate-key="footer.links.legal.terms">Όροι Χρήσης</a></li>
+                        <li><a href="#" data-translate-key="footer.links.legal.cancellation">Πολιτική Ακύρωσης & Επιστροφών</a></li>
+                    </ul>
+                    <div class="app-badges">
+                        <a href="#" class="app-badge" aria-label="Κατεβάστε την εφαρμογή μας στο App Store">
+                            <img src="Landing Page Media/Images/icons/app-store-badge.svg" alt="Κατεβάστε την εφαρμογή Therapy Field στο App Store">
+                        </a>
+                        <a href="#" class="app-badge" aria-label="Κατεβάστε την εφαρμογή μας στο Google Play">
+                            <img src="Landing Page Media/Images/icons/google-play-badge.png" alt="Κατεβάστε την εφαρμογή Therapy Field στο Google Play">
+                        </a>
+                    </div>
+                    <div class="social-links" role="navigation" aria-label="Σύνδεσμοι κοινωνικών δικτύων">
+                        <a href="#" class="social-link" aria-label="Facebook">
+                            <i class="fab fa-facebook-f" aria-hidden="true"></i>
+                        </a>
+                        <a href="#" class="social-link" aria-label="Instagram">
+                            <i class="fab fa-instagram" aria-hidden="true"></i>
+                        </a>
+                        <a href="#" class="social-link" aria-label="LinkedIn">
+                            <i class="fab fa-linkedin-in" aria-hidden="true"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="footer-disclaimer">
+            <div class="emergency-info" lang="gr" role="alert" aria-live="polite">
+                <h4 id="emergency-title-gr" data-translate-key="footer.emergency.title">Αντιμετωπίζετε ψυχική κρίση ή επείγον περιστατικό;</h4>
+                <div role="region" aria-labelledby="emergency-title-gr">
+                    <p data-translate-key="footer.emergency.notEmergencyService">Το Therapy Field δεν παρέχει υπηρεσίες άμεσης ή έκτακτης ανάγκης.</p>
+                    <p data-translate-key="footer.emergency.callIfRisk">Αν εσείς ή κάποιο αγαπημένο σας πρόσωπο διατρέχει άμεσο κίνδυνο, παρακαλούμε καλέστε:</p>
+                    <div class="emergency-lines" role="list">
+                        <div class="emergency-column" role="listitem">
+                            <p data-translate-key="footer.emergency.suicideHotline"><strong>Γραμμή Παρέμβασης για την Αυτοκτονία:</strong> <a href="tel:1018" aria-label="Καλέστε τη γραμμή παρέμβασης 1018">1018</a> (24/7, εμπιστευτική, από την ΚΛΙΜΑΚΑ)</p>
+                            <p data-translate-key="footer.emergency.socialHelp"><strong>Εθνική Γραμμή Άμεσης Κοινωνικής Βοήθειας:</strong> <a href="tel:197" aria-label="Καλέστε το 197">197</a></p>
+                            <p data-translate-key="footer.emergency.violenceHotline"><strong>Γραμμή SOS για Θύματα Βίας:</strong> <a href="tel:15900" aria-label="Καλέστε το 15900">15900</a></p>
+                        </div>
+                        <div class="emergency-column" role="listitem">
+                            <p data-translate-key="footer.emergency.childSmile"><strong>Το Χαμόγελο του Παιδιού:</strong> <a href="tel:1056" aria-label="Καλέστε το 1056">1056</a> (για ανήλικους και ενήλικες)</p>
+                            <p data-translate-key="footer.emergency.childSupportEurope"><strong>Ευρωπαϊκή Γραμμή Παιδικής Υποστήριξης:</strong> <a href="tel:116111" aria-label="Καλέστε το 116111">116111</a></p>
+                            <p data-translate-key="footer.emergency.call166or112">Ή καλέστε <a href="tel:166" aria-label="Καλέστε το 166">166</a> ή <a href="tel:112" aria-label="Καλέστε το 112">112</a> σε κάθε απειλητική κατάσταση για τη ζωή σας.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p data-translate-key="footer.copyright">© 2025 Therapy Field. Με επιφύλαξη παντός δικαιώματος.</p>
+        </div>
+    </footer>
+
+    <script src="script.js?v=<!-- Replace with current timestamp or random string -->" defer></script>
+    <script>
+    // FAQ Accordion Script
+    document.addEventListener('DOMContentLoaded', function() {
+      let question = document.querySelectorAll(".question");
+      question.forEach(question => {
+        question.addEventListener("click", event => {
+          const active = document.querySelector(".question.active");
+          if(active && active !== question ) {
+            active.classList.toggle("active");
+            active.nextElementSibling.style.maxHeight = 0;
+          }
+          question.classList.toggle("active");
+          const answer = question.nextElementSibling;
+          if(question.classList.contains("active")){
+            answer.style.maxHeight = answer.scrollHeight + "px";
+          } else {
+            answer.style.maxHeight = 0;
+          }
+        })
+      })
+    });
+    </script>
+</body>
+</html> 

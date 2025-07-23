@@ -1,0 +1,40 @@
+/* Smooth Transition Styles for Step Navigation */
+#therapist-step-1,
+#therapist-step-2 {
+  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.step-fade-out {
+  opacity: 0 !important;
+  transform: translateY(-20px) !important;
+  pointer-events: none;
+}
+
+.step-fade-in {
+  opacity: 1 !important;
+  transform: translateY(0) !important;
+}
+
+.step-slide-out-left {
+  opacity: 0 !important;
+  transform: translateX(-30px) !important;
+  pointer-events: none;
+}
+
+.step-slide-in-right {
+  opacity: 1 !important;
+  transform: translateX(0) !important;
+}
+
+.step-slide-out-right {
+  opacity: 0 !important;
+  transform: translateX(30px) !important;
+  pointer-events: none;
+}
+
+.step-slide-in-left {
+  opacity: 1 !important;
+  transform: translateX(0) !important;
+} 

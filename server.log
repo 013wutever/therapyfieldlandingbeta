@@ -1,0 +1,239 @@
+::1 - - [21/Jul/2025 21:11:45] "HEAD /user-panel.html HTTP/1.1" 200 -
+::1 - - [21/Jul/2025 21:11:57] "GET /index.html HTTP/1.1" 200 -
+::1 - - [21/Jul/2025 21:11:57] "GET /styles.css HTTP/1.1" 200 -
+::1 - - [21/Jul/2025 21:11:57] code 404, message File not found
+::1 - - [21/Jul/2025 21:11:57] "GET /Landing%20Page%20Media/Images/carefreewoman.png HTTP/1.1" 404 -
+::1 - - [21/Jul/2025 21:11:57] code 404, message File not found
+::1 - - [21/Jul/2025 21:11:57] "GET /Landing%20Page%20Media/Images/1.png HTTP/1.1" 404 -
+::1 - - [21/Jul/2025 21:11:57] code 404, message File not found
+::1 - - [21/Jul/2025 21:11:57] "GET /Landing%20Page%20Media/Images/3.png HTTP/1.1" 404 -
+::1 - - [21/Jul/2025 21:11:57] code 404, message File not found
+::1 - - [21/Jul/2025 21:11:57] code 404, message File not found
+::1 - - [21/Jul/2025 21:11:57] "GET /Landing%20Page%20Media/Images/2.png HTTP/1.1" 404 -
+::1 - - [21/Jul/2025 21:11:57] "GET /Landing%20Page%20Media/Images/4.png HTTP/1.1" 404 -
+::1 - - [21/Jul/2025 21:11:57] code 404, message File not found
+::1 - - [21/Jul/2025 21:11:57] "GET /script.js HTTP/1.1" 200 -
+::1 - - [21/Jul/2025 21:11:57] code 404, message File not found
+::1 - - [21/Jul/2025 21:11:57] "GET /Landing%20Page%20Media/Images/icon1.png HTTP/1.1" 404 -
+::1 - - [21/Jul/2025 21:11:57] code 404, message File not found
+::1 - - [21/Jul/2025 21:11:57] "GET /Landing%20Page%20Media/Images/icon2.png HTTP/1.1" 404 -
+::1 - - [21/Jul/2025 21:11:57] "GET /Landing%20Page%20Media/Images/icon3.png HTTP/1.1" 404 -
+::1 - - [21/Jul/2025 21:11:57] code 404, message File not found
+::1 - - [21/Jul/2025 21:11:57] "GET /Landing%20Page%20Media/Images/icon4.png HTTP/1.1" 404 -
+::1 - - [21/Jul/2025 21:11:57] code 404, message File not found
+::1 - - [21/Jul/2025 21:11:57] "GET /Landing%20Page%20Media/Images/icon5.png HTTP/1.1" 404 -
+::1 - - [21/Jul/2025 21:11:57] code 404, message File not found
+::1 - - [21/Jul/2025 21:11:57] "GET /Landing%20Page%20Media/Images/section6-1.jpg HTTP/1.1" 404 -
+::1 - - [21/Jul/2025 21:11:57] code 404, message File not found
+::1 - - [21/Jul/2025 21:11:57] code 404, message File not found
+::1 - - [21/Jul/2025 21:11:57] code 404, message File not found
+::1 - - [21/Jul/2025 21:11:57] code 404, message File not found
+::1 - - [21/Jul/2025 21:11:57] code 404, message File not found
+::1 - - [21/Jul/2025 21:11:57] "GET /Landing%20Page%20Media/Images/graph1.jpg HTTP/1.1" 404 -
+::1 - - [21/Jul/2025 21:11:57] "GET /Landing%20Page%20Media/Videos/therapistcards.mp4 HTTP/1.1" 404 -
+::1 - - [21/Jul/2025 21:11:57] "GET /Landing%20Page%20Media/Images/section6-4.jpg HTTP/1.1" 404 -
+::1 - - [21/Jul/2025 21:11:57] "GET /Landing%20Page%20Media/Images/section6-3.jpg HTTP/1.1" 404 -
+::1 - - [21/Jul/2025 21:11:57] "GET /Landing%20Page%20Media/Images/section6-2.jpg HTTP/1.1" 404 -
+::1 - - [21/Jul/2025 21:11:57] "GET /Landing%20Page%20Media/Images/happy-woman-therapy-field.png HTTP/1.1" 200 -
+::1 - - [21/Jul/2025 21:11:57] code 404, message File not found
+::1 - - [21/Jul/2025 21:11:57] "GET /Landing%20Page%20Media/Images/plus1.jpg HTTP/1.1" 404 -
+::1 - - [21/Jul/2025 21:11:57] "GET /Landing%20Page%20Media/Images/therapy-section-background.jpg HTTP/1.1" 200 -
+::1 - - [21/Jul/2025 21:11:57] code 404, message File not found
+::1 - - [21/Jul/2025 21:11:57] "GET /Landing%20Page%20Media/Images/plus2.jpg HTTP/1.1" 404 -
+::1 - - [21/Jul/2025 21:11:57] code 404, message File not found
+::1 - - [21/Jul/2025 21:11:57] "GET /Landing%20Page%20Media/Images/plus3.jpg HTTP/1.1" 404 -
+::1 - - [21/Jul/2025 21:11:57] code 404, message File not found
+::1 - - [21/Jul/2025 21:11:57] "GET /Landing%20Page%20Media/Images/plus4.jpg HTTP/1.1" 404 -
+::1 - - [21/Jul/2025 21:11:57] code 404, message File not found
+::1 - - [21/Jul/2025 21:11:57] "GET /Landing%20Page%20Media/Images/plus5.jpg HTTP/1.1" 404 -
+::1 - - [21/Jul/2025 21:11:57] code 404, message File not found
+::1 - - [21/Jul/2025 21:11:57] "GET /fonts/AvantGardeLTBold.woff2 HTTP/1.1" 404 -
+::1 - - [21/Jul/2025 21:11:57] "GET /Landing%20Page%20Media/1.mp4 HTTP/1.1" 200 -
+::1 - - [21/Jul/2025 21:11:57] code 404, message File not found
+::1 - - [21/Jul/2025 21:11:57] "GET /fonts/AvantGardeLTBold.woff HTTP/1.1" 404 -
+::1 - - [21/Jul/2025 21:11:58] code 404, message File not found
+::1 - - [21/Jul/2025 21:11:58] "GET /favicon.ico HTTP/1.1" 404 -
+::1 - - [21/Jul/2025 21:12:05] "GET /user-panel.html HTTP/1.1" 200 -
+::1 - - [21/Jul/2025 21:12:05] "GET /therapist-data.js HTTP/1.1" 200 -
+::1 - - [21/Jul/2025 21:12:05] "GET /fix-therapist-countries.js HTTP/1.1" 200 -
+::1 - - [21/Jul/2025 21:12:05] "GET /instant-filter-override.js HTTP/1.1" 200 -
+::1 - - [21/Jul/2025 21:12:05] "GET /improved-location-filter.js HTTP/1.1" 200 -
+::1 - - [21/Jul/2025 21:12:05] "GET /country-city-filter.js HTTP/1.1" 200 -
+::1 - - [21/Jul/2025 21:12:05] "GET /smart-country-extractor.js HTTP/1.1" 200 -
+::1 - - [21/Jul/2025 21:12:05] "GET /fixed-country-extractor.js HTTP/1.1" 200 -
+::1 - - [21/Jul/2025 21:12:05] "GET /debug-country-detection.js HTTP/1.1" 200 -
+::1 - - [21/Jul/2025 21:12:05] "GET /landing-therapist-cards.css HTTP/1.1" 200 -
+::1 - - [21/Jul/2025 21:12:05] "GET /simple-data-driven-filter.js HTTP/1.1" 200 -
+::1 - - [21/Jul/2025 21:12:05] "GET /registration-address-extractor.js HTTP/1.1" 200 -
+::1 - - [21/Jul/2025 21:12:05] "GET /therapist-availability.js HTTP/1.1" 200 -
+::1 - - [21/Jul/2025 21:12:05] "GET /therapist-booking.js HTTP/1.1" 200 -
+::1 - - [21/Jul/2025 21:12:05] "GET /quiz-system.js HTTP/1.1" 200 -
+::1 - - [21/Jul/2025 21:12:05] "GET /localStorage-integration-fix.js HTTP/1.1" 200 -
+::1 - - [21/Jul/2025 21:12:05] "GET /filter-fix-direct.js HTTP/1.1" 200 -
+::1 - - [21/Jul/2025 21:12:05] "GET /filter-fix-aggressive.js HTTP/1.1" 200 -
+::1 - - [21/Jul/2025 21:12:05] "GET /berlin-diagnostic-system.js HTTP/1.1" 200 -
+::1 - - [21/Jul/2025 21:12:05] "GET /simple-filter-fix.js HTTP/1.1" 200 -
+::1 - - [21/Jul/2025 21:12:05] "GET /authoritative-berlin-fix.js HTTP/1.1" 200 -
+::1 - - [21/Jul/2025 21:12:05] "GET /therapy-session-cost-calculator.js HTTP/1.1" 200 -
+::1 - - [21/Jul/2025 21:12:06] "GET /smooth-navigation.js HTTP/1.1" 200 -
+::1 - - [21/Jul/2025 21:12:06] code 404, message File not found
+::1 - - [21/Jul/2025 21:12:06] "GET /Sign%20Page%20Media/united-kingdom.png HTTP/1.1" 404 -
+::1 - - [21/Jul/2025 21:12:06] "GET /User%20Panel%20Media/therapist2.png HTTP/1.1" 200 -
+::1 - - [21/Jul/2025 21:12:06] "GET /User%20Panel%20Media/therapist1.png HTTP/1.1" 200 -
+::1 - - [21/Jul/2025 21:12:06] "GET /User%20Panel%20Media/therapist3.png HTTP/1.1" 200 -
+::1 - - [21/Jul/2025 21:12:06] code 404, message File not found
+::1 - - [21/Jul/2025 21:12:06] "GET /therapist_improvements.js HTTP/1.1" 404 -
+::1 - - [21/Jul/2025 21:12:11] "GET /User%20Panel%20Media/criteriaphoto.png HTTP/1.1" 200 -
+::1 - - [21/Jul/2025 21:12:11] "GET /User%20Panel%20Media/locationphoto.png HTTP/1.1" 200 -
+::1 - - [21/Jul/2025 21:12:11] "GET /User%20Panel%20Media/quizphoto.png HTTP/1.1" 200 -
+::1 - - [21/Jul/2025 21:14:22] "GET / HTTP/1.1" 200 -
+::1 - - [21/Jul/2025 21:14:22] "GET /styles.css HTTP/1.1" 200 -
+::1 - - [21/Jul/2025 21:14:22] code 404, message File not found
+::1 - - [21/Jul/2025 21:14:22] "GET /Landing%20Page%20Media/Images/carefreewoman.png HTTP/1.1" 404 -
+::1 - - [21/Jul/2025 21:14:22] code 404, message File not found
+::1 - - [21/Jul/2025 21:14:22] "GET /Landing%20Page%20Media/Images/1.png HTTP/1.1" 404 -
+::1 - - [21/Jul/2025 21:14:22] code 404, message File not found
+::1 - - [21/Jul/2025 21:14:22] code 404, message File not found
+::1 - - [21/Jul/2025 21:14:22] "GET /Landing%20Page%20Media/Images/2.png HTTP/1.1" 404 -
+::1 - - [21/Jul/2025 21:14:22] "GET /Landing%20Page%20Media/Images/3.png HTTP/1.1" 404 -
+::1 - - [21/Jul/2025 21:14:22] code 404, message File not found
+::1 - - [21/Jul/2025 21:14:22] "GET /Landing%20Page%20Media/Images/4.png HTTP/1.1" 404 -
+::1 - - [21/Jul/2025 21:14:22] code 404, message File not found
+::1 - - [21/Jul/2025 21:14:22] "GET /Landing%20Page%20Media/Images/icon1.png HTTP/1.1" 404 -
+::1 - - [21/Jul/2025 21:14:22] code 404, message File not found
+::1 - - [21/Jul/2025 21:14:22] "GET /Landing%20Page%20Media/Images/icon3.png HTTP/1.1" 404 -
+::1 - - [21/Jul/2025 21:14:22] code 404, message File not found
+::1 - - [21/Jul/2025 21:14:22] "GET /Landing%20Page%20Media/Images/icon2.png HTTP/1.1" 404 -
+::1 - - [21/Jul/2025 21:14:22] code 404, message File not found
+::1 - - [21/Jul/2025 21:14:22] "GET /Landing%20Page%20Media/Images/icon4.png HTTP/1.1" 404 -
+::1 - - [21/Jul/2025 21:14:22] code 404, message File not found
+::1 - - [21/Jul/2025 21:14:22] "GET /Landing%20Page%20Media/Images/icon5.png HTTP/1.1" 404 -
+::1 - - [21/Jul/2025 21:14:22] code 404, message File not found
+::1 - - [21/Jul/2025 21:14:22] "GET /Landing%20Page%20Media/Images/section6-1.jpg HTTP/1.1" 404 -
+::1 - - [21/Jul/2025 21:14:22] code 404, message File not found
+::1 - - [21/Jul/2025 21:14:22] "GET /Landing%20Page%20Media/Images/section6-2.jpg HTTP/1.1" 404 -
+::1 - - [21/Jul/2025 21:14:22] code 404, message File not found
+::1 - - [21/Jul/2025 21:14:22] "GET /Landing%20Page%20Media/Images/section6-3.jpg HTTP/1.1" 404 -
+::1 - - [21/Jul/2025 21:14:22] code 404, message File not found
+::1 - - [21/Jul/2025 21:14:22] "GET /Landing%20Page%20Media/Images/section6-4.jpg HTTP/1.1" 404 -
+::1 - - [21/Jul/2025 21:14:22] code 404, message File not found
+::1 - - [21/Jul/2025 21:14:22] "GET /Landing%20Page%20Media/Images/graph1.jpg HTTP/1.1" 404 -
+::1 - - [21/Jul/2025 21:14:22] "GET /script.js HTTP/1.1" 200 -
+::1 - - [21/Jul/2025 21:14:22] code 404, message File not found
+::1 - - [21/Jul/2025 21:14:22] "GET /Landing%20Page%20Media/Videos/therapistcards.mp4 HTTP/1.1" 404 -
+::1 - - [21/Jul/2025 21:14:23] "GET /Landing%20Page%20Media/Images/happy-woman-therapy-field.png HTTP/1.1" 200 -
+::1 - - [21/Jul/2025 21:14:23] "GET /Landing%20Page%20Media/Images/therapy-section-background.jpg HTTP/1.1" 200 -
+::1 - - [21/Jul/2025 21:14:23] code 404, message File not found
+::1 - - [21/Jul/2025 21:14:23] "GET /Landing%20Page%20Media/Images/plus1.jpg HTTP/1.1" 404 -
+::1 - - [21/Jul/2025 21:14:23] code 404, message File not found
+::1 - - [21/Jul/2025 21:14:23] "GET /Landing%20Page%20Media/Images/plus2.jpg HTTP/1.1" 404 -
+::1 - - [21/Jul/2025 21:14:23] code 404, message File not found
+::1 - - [21/Jul/2025 21:14:23] "GET /Landing%20Page%20Media/Images/plus3.jpg HTTP/1.1" 404 -
+::1 - - [21/Jul/2025 21:14:23] code 404, message File not found
+::1 - - [21/Jul/2025 21:14:23] "GET /Landing%20Page%20Media/Images/plus4.jpg HTTP/1.1" 404 -
+::1 - - [21/Jul/2025 21:14:23] code 404, message File not found
+::1 - - [21/Jul/2025 21:14:23] "GET /Landing%20Page%20Media/Images/plus5.jpg HTTP/1.1" 404 -
+::1 - - [21/Jul/2025 21:14:23] code 404, message File not found
+::1 - - [21/Jul/2025 21:14:23] "GET /fonts/AvantGardeLTBold.woff2 HTTP/1.1" 404 -
+::1 - - [21/Jul/2025 21:14:23] "GET /Landing%20Page%20Media/1.mp4 HTTP/1.1" 200 -
+::1 - - [21/Jul/2025 21:14:23] code 404, message File not found
+::1 - - [21/Jul/2025 21:14:23] "GET /fonts/AvantGardeLTBold.woff HTTP/1.1" 404 -
+::1 - - [21/Jul/2025 21:14:23] code 404, message File not found
+::1 - - [21/Jul/2025 21:14:23] "GET /apple-touch-icon-precomposed.png HTTP/1.1" 404 -
+::1 - - [21/Jul/2025 21:14:23] code 404, message File not found
+::1 - - [21/Jul/2025 21:14:23] "GET /apple-touch-icon-precomposed.png HTTP/1.1" 404 -
+::1 - - [21/Jul/2025 21:14:23] code 404, message File not found
+::1 - - [21/Jul/2025 21:14:23] code 404, message File not found
+::1 - - [21/Jul/2025 21:14:23] "GET /apple-touch-icon.png HTTP/1.1" 404 -
+::1 - - [21/Jul/2025 21:14:23] "GET /favicon.ico HTTP/1.1" 404 -
+::1 - - [21/Jul/2025 21:14:23] code 404, message File not found
+::1 - - [21/Jul/2025 21:14:23] "GET /Landing%20Page%20Media/Images/carefreewoman.png HTTP/1.1" 404 -
+::1 - - [21/Jul/2025 21:14:23] code 404, message File not found
+::1 - - [21/Jul/2025 21:14:23] "GET /favicon.ico HTTP/1.1" 404 -
+::1 - - [21/Jul/2025 21:14:23] code 404, message File not found
+::1 - - [21/Jul/2025 21:14:23] "GET /apple-touch-icon.png HTTP/1.1" 404 -
+::1 - - [21/Jul/2025 21:14:30] "GET /Landing%20Page%20Media/2.mp4 HTTP/1.1" 200 -
+::1 - - [21/Jul/2025 21:52:23] "GET /user-panel.html HTTP/1.1" 200 -
+::1 - - [21/Jul/2025 21:52:23] "GET /improved-location-filter.js HTTP/1.1" 304 -
+::1 - - [21/Jul/2025 21:52:23] "GET /simple-data-driven-filter.js HTTP/1.1" 304 -
+::1 - - [21/Jul/2025 21:52:23] "GET /fixed-country-extractor.js HTTP/1.1" 304 -
+::1 - - [21/Jul/2025 21:52:23] code 404, message File not found
+::1 - - [21/Jul/2025 21:52:23] "GET /Sign%20Page%20Media/united-kingdom.png HTTP/1.1" 404 -
+::1 - - [21/Jul/2025 21:52:23] code 404, message File not found
+::1 - - [21/Jul/2025 21:52:23] "GET /therapist_improvements.js HTTP/1.1" 404 -
+::1 - - [21/Jul/2025 21:52:31] code 404, message File not found
+::1 - - [21/Jul/2025 21:52:31] "GET /Sign%20Page%20Media/united-kingdom.png HTTP/1.1" 404 -
+::1 - - [21/Jul/2025 21:52:31] code 404, message File not found
+::1 - - [21/Jul/2025 21:52:31] "GET /therapist_improvements.js HTTP/1.1" 404 -
+::1 - - [21/Jul/2025 21:53:06] "GET /user-panel.html HTTP/1.1" 200 -
+::1 - - [21/Jul/2025 21:53:06] code 404, message File not found
+::1 - - [21/Jul/2025 21:53:06] "GET /Sign%20Page%20Media/united-kingdom.png HTTP/1.1" 404 -
+::1 - - [21/Jul/2025 21:53:06] code 404, message File not found
+::1 - - [21/Jul/2025 21:53:06] "GET /therapist_improvements.js HTTP/1.1" 404 -
+::1 - - [21/Jul/2025 21:53:23] "GET /user-panel.html HTTP/1.1" 200 -
+::1 - - [21/Jul/2025 21:53:23] code 404, message File not found
+::1 - - [21/Jul/2025 21:53:23] "GET /Sign%20Page%20Media/united-kingdom.png HTTP/1.1" 404 -
+::1 - - [21/Jul/2025 21:53:23] code 404, message File not found
+::1 - - [21/Jul/2025 21:53:23] "GET /therapist_improvements.js HTTP/1.1" 404 -
+::1 - - [21/Jul/2025 21:53:48] "GET /Landing%20Page%20Media/3.mp4 HTTP/1.1" 200 -
+::1 - - [21/Jul/2025 21:53:57] "GET /Landing%20Page%20Media/4.mp4 HTTP/1.1" 200 -
+::1 - - [21/Jul/2025 22:05:41] "GET /user-panel.html HTTP/1.1" 200 -
+::1 - - [21/Jul/2025 22:05:41] "GET /improved-location-filter.js HTTP/1.1" 304 -
+::1 - - [21/Jul/2025 22:05:41] "GET /fixed-country-extractor.js HTTP/1.1" 304 -
+::1 - - [21/Jul/2025 22:05:41] "GET /simple-data-driven-filter.js HTTP/1.1" 304 -
+::1 - - [21/Jul/2025 22:05:41] code 404, message File not found
+::1 - - [21/Jul/2025 22:05:41] "GET /Sign%20Page%20Media/united-kingdom.png HTTP/1.1" 404 -
+::1 - - [21/Jul/2025 22:05:41] code 404, message File not found
+::1 - - [21/Jul/2025 22:05:41] "GET /therapist_improvements.js HTTP/1.1" 404 -
+::1 - - [21/Jul/2025 22:09:25] "GET /user-panel.html HTTP/1.1" 200 -
+::1 - - [21/Jul/2025 22:09:25] code 404, message File not found
+::1 - - [21/Jul/2025 22:09:25] "GET /Sign%20Page%20Media/united-kingdom.png HTTP/1.1" 404 -
+::1 - - [21/Jul/2025 22:09:25] code 404, message File not found
+::1 - - [21/Jul/2025 22:09:25] "GET /therapist_improvements.js HTTP/1.1" 404 -
+::1 - - [21/Jul/2025 22:09:57] "GET /user-panel.html HTTP/1.1" 304 -
+::1 - - [21/Jul/2025 22:09:57] code 404, message File not found
+::1 - - [21/Jul/2025 22:09:57] "GET /Sign%20Page%20Media/united-kingdom.png HTTP/1.1" 404 -
+::1 - - [21/Jul/2025 22:09:57] code 404, message File not found
+::1 - - [21/Jul/2025 22:09:57] "GET /therapist_improvements.js HTTP/1.1" 404 -
+::1 - - [21/Jul/2025 22:13:11] "GET /user-panel.html HTTP/1.1" 200 -
+::1 - - [21/Jul/2025 22:13:11] "GET /improved-location-filter.js HTTP/1.1" 304 -
+::1 - - [21/Jul/2025 22:13:11] "GET /fixed-country-extractor.js HTTP/1.1" 304 -
+::1 - - [21/Jul/2025 22:13:11] "GET /simple-data-driven-filter.js HTTP/1.1" 304 -
+::1 - - [21/Jul/2025 22:13:12] code 404, message File not found
+::1 - - [21/Jul/2025 22:13:12] "GET /Sign%20Page%20Media/united-kingdom.png HTTP/1.1" 404 -
+::1 - - [21/Jul/2025 22:13:12] code 404, message File not found
+::1 - - [21/Jul/2025 22:13:12] "GET /therapist_improvements.js HTTP/1.1" 404 -
+::1 - - [21/Jul/2025 22:13:14] "GET /user-panel.html HTTP/1.1" 304 -
+::1 - - [21/Jul/2025 22:13:14] code 404, message File not found
+::1 - - [21/Jul/2025 22:13:14] "GET /Sign%20Page%20Media/united-kingdom.png HTTP/1.1" 404 -
+::1 - - [21/Jul/2025 22:13:14] code 404, message File not found
+::1 - - [21/Jul/2025 22:13:14] "GET /therapist_improvements.js HTTP/1.1" 404 -
+::1 - - [21/Jul/2025 22:14:45] "GET /user-panel.html HTTP/1.1" 200 -
+::1 - - [21/Jul/2025 22:14:45] code 404, message File not found
+::1 - - [21/Jul/2025 22:14:45] "GET /Sign%20Page%20Media/united-kingdom.png HTTP/1.1" 404 -
+::1 - - [21/Jul/2025 22:14:45] code 404, message File not found
+::1 - - [21/Jul/2025 22:14:45] "GET /therapist_improvements.js HTTP/1.1" 404 -
+::1 - - [21/Jul/2025 22:16:18] "GET /user-panel.html HTTP/1.1" 200 -
+::1 - - [21/Jul/2025 22:16:18] code 404, message File not found
+::1 - - [21/Jul/2025 22:16:18] "GET /Sign%20Page%20Media/united-kingdom.png HTTP/1.1" 404 -
+::1 - - [21/Jul/2025 22:16:18] code 404, message File not found
+::1 - - [21/Jul/2025 22:16:18] "GET /therapist_improvements.js HTTP/1.1" 404 -
+::1 - - [21/Jul/2025 22:16:52] "GET /user-panel.html HTTP/1.1" 304 -
+::1 - - [21/Jul/2025 22:16:52] code 404, message File not found
+::1 - - [21/Jul/2025 22:16:52] "GET /Sign%20Page%20Media/united-kingdom.png HTTP/1.1" 404 -
+::1 - - [21/Jul/2025 22:16:52] code 404, message File not found
+::1 - - [21/Jul/2025 22:16:52] "GET /therapist_improvements.js HTTP/1.1" 404 -
+::1 - - [21/Jul/2025 22:18:53] "GET /user-panel.html HTTP/1.1" 304 -
+::1 - - [21/Jul/2025 22:18:53] code 404, message File not found
+::1 - - [21/Jul/2025 22:18:53] "GET /Sign%20Page%20Media/united-kingdom.png HTTP/1.1" 404 -
+::1 - - [21/Jul/2025 22:18:53] code 404, message File not found
+::1 - - [21/Jul/2025 22:18:53] "GET /therapist_improvements.js HTTP/1.1" 404 -
+::1 - - [21/Jul/2025 22:18:59] "GET /user-panel.html HTTP/1.1" 304 -
+::1 - - [21/Jul/2025 22:18:59] code 404, message File not found
+::1 - - [21/Jul/2025 22:18:59] "GET /Sign%20Page%20Media/united-kingdom.png HTTP/1.1" 404 -
+::1 - - [21/Jul/2025 22:18:59] code 404, message File not found
+::1 - - [21/Jul/2025 22:18:59] "GET /therapist_improvements.js HTTP/1.1" 404 -
+::1 - - [21/Jul/2025 22:19:10] code 404, message File not found
+::1 - - [21/Jul/2025 22:19:10] "GET /Sign%20Page%20Media/united-kingdom.png HTTP/1.1" 404 -
+::1 - - [21/Jul/2025 22:19:10] code 404, message File not found
+::1 - - [21/Jul/2025 22:19:10] "GET /therapist_improvements.js HTTP/1.1" 404 -

@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smooth Step Transitions Demo</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        
+        .step {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 40px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            opacity: 1;
+            transform: translateX(0);
+        }
+        
+        .step.hidden {
+            display: none;
+        }
+        
+        .step-slide-out-left {
+            opacity: 0 !important;
+            transform: translateX(-30px) !important;
+            pointer-events: none;
+        }
+        
+        .step-slide-in-right {
+            opacity: 1 !important;
+            transform: translateX(0) !important;
+        }
+        
+        .step-slide-out-right {
+            opacity: 0 !important;
+            transform: translateX(30px) !important;
+            pointer-events: none;
+        }
+        
+        .step-slide-in-left {
+            opacity: 1 !important;
+            transform: translateX(0) !important;
+        }
+        
+        .btn {
+            background: #002855;
+            color: white;
+            border: 1px solid #001d3d;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin: 10px;
+            transition: all 0.3s ease;
+        }
+        
+        .btn:hover {
+            background: #001d3d;
+            transform: translateY(-1px);
+        }
+    </style>
+</head>
+<body>
+    <div id="step-1" class="step">
+        <h2>Step 1: Find Therapist</h2>
+        <p>Welcome to the therapist finder. Click the button below to continue to the selection options.</p>
+        <button class="btn" onclick="navigateToStep2()">Find Therapist</button>
+    </div>
+    
+    <div id="step-2" class="step hidden">
+        <h2>Step 2: Choose Search Method</h2>
+        <p>How would you like to search for a therapist?</p>
+        <button class="btn" style="background: rgba(0, 40, 85, 0.9);">Location</button>
+        <button class="btn" style="background: rgba(0, 40, 85, 0.9);">Criteria</button>
+        <button class="btn" style="background: rgba(0, 40, 85, 0.9);">Quiz</button>
+        <br><br>
+        <button class="btn" onclick="navigateToStep1()">← Back</button>
+    </div>
+
+    <script>
+        function navigateToStep2() {
+            console.log("🎬 Transitioning to Step 2");
+            const step1 = document.getElementById("step-1");
+            const step2 = document.getElementById("step-2");
+            
+            // Slide out Step 1 to left
+            step1.classList.add('step-slide-out-left');
+            
+            // Prepare Step 2 (visible but off-screen right)
+            step2.style.display = 'block';
+            step2.classList.remove('hidden');
+            step2.classList.add('step-slide-out-right');
+            
+            // After short delay, slide in Step 2 from right
+            setTimeout(() => {
+                step2.classList.remove('step-slide-out-right');
+                step2.classList.add('step-slide-in-left');
+            }, 50);
+            
+            // Clean up after transition
+            setTimeout(() => {
+                step1.style.display = 'none';
+                step1.classList.add('hidden');
+                step1.classList.remove('step-slide-out-left');
+                step2.classList.remove('step-slide-in-left');
+            }, 550);
+        }
+        
+        function navigateToStep1() {
+            console.log("🎬 Transitioning to Step 1");
+            const step1 = document.getElementById("step-1");
+            const step2 = document.getElementById("step-2");
+            
+            // Slide out Step 2 to right
+            step2.classList.add('step-slide-out-right');
+            
+            // Prepare Step 1 (visible but off-screen left)
+            step1.style.display = 'block';
+            step1.classList.remove('hidden');
+            step1.classList.add('step-slide-out-left');
+            
+            // After short delay, slide in Step 1 from left
+            setTimeout(() => {
+                step1.classList.remove('step-slide-out-left');
+                step1.classList.add('step-slide-in-right');
+            }, 50);
+            
+            // Clean up after transition
+            setTimeout(() => {
+                step2.style.display = 'none';
+                step2.classList.add('hidden');
+                step2.classList.remove('step-slide-out-right');
+                step1.classList.remove('step-slide-in-right');
+            }, 550);
+        }
+    </script>
+</body>
+</html> 

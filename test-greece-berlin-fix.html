@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Greece Berlin Fix Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; max-width: 800px; margin: 0 auto; }
+        .test-section { border: 1px solid #ccc; padding: 20px; margin: 20px 0; border-radius: 8px; }
+        .problem { background: #ffebee; border-color: #f44336; }
+        .solution { background: #e8f5e8; border-color: #4caf50; }
+        select { padding: 10px; font-size: 16px; width: 300px; margin: 10px 0; }
+        button { padding: 10px 20px; font-size: 16px; margin: 10px 0; background: #2196F3; color: white; border: none; border-radius: 4px; cursor: pointer; }
+        button:hover { background: #1976D2; }
+        .log { background: #f5f5f5; padding: 15px; margin: 10px 0; border-radius: 4px; font-family: monospace; white-space: pre-wrap; max-height: 300px; overflow-y: auto; }
+        .highlight { background: yellow; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <h1>🎯 Greece Berlin Fix Test</h1>
+    <p>This test demonstrates the fix for the "Greece, Berlin" issue in city filters.</p>
+
+    <!-- PROBLEM DEMONSTRATION -->
+    <div class="test-section problem">
+        <h2>❌ THE PROBLEM</h2>
+        <p>This shows the <strong>broken filter</strong> with hardcoded options:</p>
+        
+        <select id="broken-filter">
+            <option value="">All Cities</option>
+            <!-- These are the problematic hardcoded options -->
+            <option value="athens">Athens</option>
+            <option value="paris">Paris</option>
+            <option value="rome">Rome</option>
+            <option value="berlin">Berlin</option>
+            <option value="london">London</option>
+        </select>
+        
+        <p>☝️ <span class="highlight">Notice: "Berlin" shows as just "Berlin" (gets interpreted as "Greece, Berlin")</span></p>
+    </div>
+
+    <!-- SOLUTION DEMONSTRATION -->
+    <div class="test-section solution">
+        <h2>✅ THE SOLUTION</h2>
+        <p>This shows the <strong>correct filter</strong> with proper country prefixes:</p>
+        
+        <select id="fixed-filter">
+            <option value="">All Cities</option>
+            <!-- These are the correct options with country prefixes -->
+            <option value="athens">Greece, Athens</option>
+            <option value="paris">France, Paris</option>
+            <option value="rome">Italy, Rome</option>
+            <option value="berlin">Germany, Berlin</option>
+            <option value="london">United Kingdom, London</option>
+        </select>
+        
+        <p>☝️ <span class="highlight">Notice: "Germany, Berlin" is correct!</span></p>
+    </div>
+
+    <!-- LIVE TEST -->
+    <div class="test-section">
+        <h2>🧪 LIVE TEST</h2>
+        <p>This demonstrates the fix being applied in real-time:</p>
+        
+        <select id="test-filter">
+            <option value="">All Cities</option>
+            <!-- Start with broken options -->
+            <option value="athens">Athens</option>
+            <option value="paris">Paris</option>
+            <option value="rome">Rome</option>
+            <option value="berlin">Berlin</option>
+            <option value="london">London</option>
+        </select>
+        
+        <br>
+        <button onclick="applyFix()">🔧 Apply Fix</button>
+        <button onclick="resetToBroken()">❌ Reset to Broken</button>
+        <button onclick="analyzeCurrentState()">🔍 Analyze Current State</button>
+        
+        <div id="log" class="log">Click "Analyze Current State" to see what's in the filter...</div>
+    </div>
+
+    <!-- INSTRUCTIONS -->
+    <div class="test-section">
+        <h2>📋 INSTRUCTIONS</h2>
+        <ol>
+            <li><strong>Compare the filters above</strong> - see the difference between broken and fixed</li>
+            <li><strong>Click "Apply Fix"</strong> to see the transformation happen</li>
+            <li><strong>Click "Analyze Current State"</strong> to see detailed options</li>
+            <li><strong>Copy the fix code</strong> (shown below) to your main page</li>
+        </ol>
+        
+        <h3>🔧 Fix Code for Your Main Page:</h3>
+        <div class="log">
+// Copy this to your browser console on the main page:
+const cityFilter = document.getElementById('city-filter');
+if (cityFilter) {
+    cityFilter.innerHTML = `
+        &lt;option value=""&gt;All Cities&lt;/option&gt;
+        &lt;option value="athens"&gt;Greece, Athens&lt;/option&gt;
+        &lt;option value="paris"&gt;France, Paris&lt;/option&gt;
+        &lt;option value="rome"&gt;Italy, Rome&lt;/option&gt;
+        &lt;option value="berlin"&gt;Germany, Berlin&lt;/option&gt;
+        &lt;option value="london"&gt;United Kingdom, London&lt;/option&gt;
+    `;
+    console.log('✅ Fixed! Berlin now shows as "Germany, Berlin"');
+} else {
+    console.log('❌ City filter not found');
+}
+        </div>
+    </div>
+
+    <script>
+        function log(message) {
+            const logDiv = document.getElementById('log');
+            logDiv.textContent += new Date().toLocaleTimeString() + ': ' + message + '\n';
+            logDiv.scrollTop = logDiv.scrollHeight;
+        }
+
+        function applyFix() {
+            log('🔧 Applying fix...');
+            
+            const testFilter = document.getElementById('test-filter');
+            
+            // Clear and rebuild with correct options
+            testFilter.innerHTML = `
+                <option value="">All Cities</option>
+                <option value="athens">Greece, Athens</option>
+                <option value="paris">France, Paris</option>
+                <option value="rome">Italy, Rome</option>
+                <option value="berlin">Germany, Berlin</option>
+                <option value="london">United Kingdom, London</option>
+            `;
+            
+            log('✅ Fix applied! Berlin now shows as "Germany, Berlin"');
+            analyzeCurrentState();
+        }
+
+        function resetToBroken() {
+            log('❌ Resetting to broken state...');
+            
+            const testFilter = document.getElementById('test-filter');
+            
+            // Reset to broken options
+            testFilter.innerHTML = `
+                <option value="">All Cities</option>
+                <option value="athens">Athens</option>
+                <option value="paris">Paris</option>
+                <option value="rome">Rome</option>
+                <option value="berlin">Berlin</option>
+                <option value="london">London</option>
+            `;
+            
+            log('❌ Reset complete - back to broken state');
+            analyzeCurrentState();
+        }
+
+        function analyzeCurrentState() {
+            log('🔍 Analyzing current filter state...');
+            
+            const testFilter = document.getElementById('test-filter');
+            log(`📊 Total options: ${testFilter.options.length}`);
+            
+            Array.from(testFilter.options).forEach((opt, index) => {
+                const text = opt.textContent;
+                const value = opt.value;
+                
+                if (text.includes('Berlin')) {
+                    if (text === 'Germany, Berlin') {
+                        log(`  ${index + 1}. "${text}" (${value}) ✅ CORRECT`);
+                    } else {
+                        log(`  ${index + 1}. "${text}" (${value}) ❌ INCORRECT`);
+                    }
+                } else if (text !== 'All Cities') {
+                    log(`  ${index + 1}. "${text}" (${value})`);
+                }
+            });
+            
+            // Check specifically for Berlin
+            const berlinOption = Array.from(testFilter.options).find(opt => opt.value === 'berlin');
+            if (berlinOption) {
+                const berlinText = berlinOption.textContent;
+                log(`🎯 Berlin option: "${berlinText}"`);
+                
+                if (berlinText === 'Germany, Berlin') {
+                    log('✅ SUCCESS: Berlin correctly shows as "Germany, Berlin"');
+                } else if (berlinText === 'Berlin') {
+                    log('❌ PROBLEM: Berlin shows as just "Berlin" (causes Greece, Berlin)');
+                } else {
+                    log(`❓ UNKNOWN: Berlin shows as "${berlinText}"`);
+                }
+            } else {
+                log('❌ No Berlin option found');
+            }
+            
+            log('--- Analysis complete ---\n');
+        }
+
+        // Auto-analyze on page load
+        window.onload = function() {
+            log('🎯 Greece Berlin Fix Test loaded');
+            log('This test demonstrates the fix for city filter issues');
+            analyzeCurrentState();
+        };
+    </script>
+</body>
+</html> 

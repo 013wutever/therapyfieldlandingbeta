@@ -1,0 +1,2172 @@
+// Therapist Booking Interface Management
+// Handles calendar display, appointment selection, and booking confirmation
+
+// Global booking state
+window.bookingState = {
+  currentTherapist: null,
+  selectedDate: null,
+  selectedTime: null,
+  selectedDuration: 1,
+  selectedService: null,
+  currentMonth: new Date().getMonth(),
+  currentYear: new Date().getFullYear()
+};
+
+// Navigate to booking step
+window.navigateToBookingStep = function(therapist) {
+  console.log('🗓️ navigateToBookingStep called with:', typeof therapist, therapist);
+  
+  // Verify therapist object structure
+  if (!therapist || typeof therapist !== 'object') {
+    console.error('❌ Invalid therapist object:', therapist);
+    return;
+  }
+  
+  if (!therapist.first_name || !therapist.last_name) {
+    console.error('❌ Therapist object missing required fields:', therapist);
+    return;
+  }
+  
+  // STORE WHERE USER CAME FROM so we can return them there later
+  const visibleSteps = ['therapist-step-1', 'therapist-step-2', 'therapist-step-3-location', 'therapist-step-3-criteria', 'therapist-step-3-quiz'];
+  let currentStep = 'therapist-step-1'; // default fallback
+  
+  visibleSteps.forEach(stepId => {
+    const element = document.getElementById(stepId);
+    if (element && !element.classList.contains('hidden') && element.style.display !== 'none') {
+      currentStep = stepId;
+      console.log('📍 User came from step:', stepId);
+    }
+  });
+  
+  // Store the previous step in booking state
+  if (!window.bookingState) {
+    window.bookingState = {};
+  }
+  window.bookingState.previousStep = currentStep;
+  console.log('💾 Stored previous step:', currentStep);
+  
+  const fullName = `Dr. ${therapist.first_name} ${therapist.last_name}`;
+  console.log('🗓️ Navigating to booking step for:', fullName);
+  
+  // Hide all other steps
+  const steps = ['therapist-step-1', 'therapist-step-2', 'therapist-step-3-location', 'therapist-step-3-criteria', 'therapist-step-3-quiz'];
+  steps.forEach(stepId => {
+    const element = document.getElementById(stepId);
+    if (element) {
+      element.style.display = 'none';
+      element.classList.add('hidden');
+    }
+  });
+  
+  // Show booking step
+  const bookingStep = document.getElementById('therapist-step-booking');
+  if (bookingStep) {
+    bookingStep.style.display = 'block';
+    bookingStep.classList.remove('hidden');
+    bookingStep.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    console.log('✅ Booking step shown successfully');
+  } else {
+    console.error('❌ therapist-step-booking element not found!');
+    return;
+  }
+  
+  // Initialize booking for this therapist
+  console.log('🔄 Starting booking initialization...');
+  window.initializeBooking(therapist);
+};
+
+// Initialize booking step for a specific therapist
+window.initializeBooking = function(therapist) {
+  console.log('🔧 initializeBooking called with therapist:', therapist?.first_name, therapist?.last_name);
+  
+  if (!therapist || !therapist.first_name) {
+    console.error('❌ Invalid therapist object passed to initializeBooking:', therapist);
+    return;
+  }
+  
+  // Note: Container clearing is now handled more selectively to avoid breaking the booking flow
+  console.log('🔧 Initializing booking for new therapist...');
+  
+  // Reset booking state completely first
+  window.bookingState = {
+    currentTherapist: null,
+    selectedDate: null,
+    selectedTime: null,
+    selectedDuration: 1,
+    selectedService: null,
+    currentMonth: new Date().getMonth(),
+    currentYear: new Date().getFullYear()
+  };
+  
+  // Set the current therapist
+  window.bookingState.currentTherapist = therapist;
+  window.bookingState.selectedService = null;
+  console.log('✅ Booking state reset and therapist set:', therapist?.first_name, therapist?.last_name);
+  
+  // CRITICAL: Clear any existing service selections in the UI
+  // This ensures no visual remnants from previous bookings
+  document.querySelectorAll('.service-option').forEach(option => {
+    option.classList.remove('border-blue-500', 'bg-blue-50', 'ring-2', 'ring-blue-200', 'hidden');
+    option.classList.add('border-gray-200', 'bg-gray-50');
+  });
+  
+  // Remove any existing change service buttons
+  document.querySelectorAll('.change-service-btn').forEach(btn => btn.remove());
+  
+  console.log('✅ Service selection UI cleared');
+  
+  // Ensure availability data is generated
+  if (!window.therapistAvailability) {
+    console.log('🗓️ Initializing availability data for booking...');
+    window.initializeAvailabilityData();
+  }
+  
+  // Debug: Check if this specific therapist has availability
+  const therapistId = therapist.id || window.therapistData.indexOf(therapist);
+  if (!window.therapistAvailability[therapistId]) {
+    console.warn(`⚠️ No availability found for therapist ${therapistId}, generating...`);
+    window.therapistAvailability[therapistId] = window.generateTherapistAvailability(therapistId);
+  }
+  
+  // Force regenerate availability to ensure adequate slots
+  console.log(`🔄 Force regenerating availability for therapist ${therapistId} to ensure adequate slots...`);
+  window.therapistAvailability[therapistId] = window.generateTherapistAvailability(therapistId);
+  
+  // Hide booking sections initially
+  window.hideBookingSections();
+  
+  // CRITICAL: Ensure main booking containers are visible
+  // This fixes the issue where containers might be hidden from previous sessions
+  const mainContainers = ['booking-therapist-info', 'service-selection-section'];
+  mainContainers.forEach(containerId => {
+    const container = document.getElementById(containerId);
+    if (container) {
+      container.classList.remove('hidden');
+      container.style.display = '';
+      console.log(`✅ Ensured ${containerId} is visible`);
+    }
+  });
+  
+  // CRITICAL: Hide the booking completion section if it's visible from a previous booking
+  const completionSection = document.getElementById('booking-completed-section');
+  if (completionSection) {
+    completionSection.classList.add('hidden');
+    completionSection.style.display = 'none';
+    console.log('✅ Hid booking completion section from previous session');
+  }
+  
+  // Populate therapist info
+  window.populateTherapistInfo(therapist);
+  
+  // Populate service selection
+  window.populateServiceSelection(therapist);
+  
+  // Initialize calendar (but keep it hidden)
+  window.initializeCalendar();
+  
+  const fullName = `Dr. ${therapist.first_name} ${therapist.last_name}`;
+  console.log('✅ Booking initialized for', fullName);
+};
+
+// Populate therapist information in booking header
+window.populateTherapistInfo = function(therapist) {
+  const container = document.getElementById('booking-therapist-info');
+  if (!container) {
+    console.error('❌ booking-therapist-info container not found!');
+    return;
+  }
+  
+  console.log('🔧 Populating therapist info for:', therapist?.first_name, therapist?.last_name);
+  
+  // Clear container first and ensure it's visible
+  container.innerHTML = '';
+  container.classList.remove('hidden');
+  container.style.display = 'block';
+  
+  const fullName = `Dr. ${therapist.first_name} ${therapist.last_name}`;
+  
+  container.innerHTML = `
+    <div class="flex items-start gap-3 md:gap-4">
+      <div class="flex-shrink-0">
+        <img src="${therapist.image || therapist.photo}" alt="${fullName}" class="w-12 h-12 md:w-16 md:h-16 rounded-2xl object-cover shadow-sm">
+      </div>
+      <div class="flex-1 min-w-0">
+        <div class="mb-2">
+          <h2 class="text-base md:text-lg font-semibold text-gray-800" style="font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', system-ui, sans-serif; letter-spacing: -0.02em; line-height: 1.2;">${fullName}</h2>
+          <button onclick="toggleTherapistDetails()" class="md:hidden inline-flex items-center gap-1 text-xs text-gray-600 hover:text-blue-600 font-medium transition-colors duration-200 mt-2">
+            <span id="toggle-text">More details</span>
+            <svg id="toggle-icon" class="w-3 h-3 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+            </svg>
+          </button>
+        </div>
+        
+        <!-- Desktop: Always visible, Mobile: Initially hidden -->
+        <div id="therapist-details" class="hidden md:block space-y-1">
+          <p class="text-sm font-medium text-gray-600" style="font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', system-ui, sans-serif;">${therapist.title}</p>
+          <div class="flex items-center gap-2">
+            <div class="w-2 h-2 bg-blue-500 rounded-full"></div>
+            <span class="text-sm text-gray-500" style="font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', system-ui, sans-serif;">${therapist.area}, ${therapist.city}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+  
+  // Add toggle functionality for mobile (if not already defined)
+  if (!window.toggleTherapistDetails) {
+    window.toggleTherapistDetails = function() {
+      const details = document.getElementById('therapist-details');
+      const toggleText = document.getElementById('toggle-text');
+      const toggleIcon = document.getElementById('toggle-icon');
+      
+      if (details.classList.contains('hidden')) {
+        details.classList.remove('hidden');
+        toggleText.textContent = 'Less details';
+        toggleIcon.classList.add('rotate-180');
+      } else {
+        details.classList.add('hidden');
+        toggleText.textContent = 'More details';
+        toggleIcon.classList.remove('rotate-180');
+      }
+    };
+  }
+};
+
+// Populate service selection based on therapist's offerings
+window.populateServiceSelection = function(therapist) {
+  console.log('🔧 populateServiceSelection called for:', therapist?.first_name, therapist?.last_name);
+  
+  const container = document.getElementById('booking-services-container');
+  if (!container) {
+    console.error('❌ booking-services-container not found!');
+    return;
+  }
+  
+  // Clear container first and ensure it's visible
+  container.innerHTML = '';
+  container.classList.remove('hidden');
+  container.style.display = 'block';
+  
+  // Also ensure parent service section is visible
+  const serviceSection = container.closest('.bg-white.rounded-2xl');
+  if (serviceSection) {
+    serviceSection.classList.remove('hidden');
+    serviceSection.style.display = 'block';
+  }
+  
+  // CRITICAL: Also ensure the parent service selection section is visible
+  const parentServiceSection = document.getElementById('service-selection-section');
+  if (parentServiceSection) {
+    parentServiceSection.classList.remove('hidden');
+    parentServiceSection.style.display = 'block';
+  }
+  
+  // CRITICAL: Reset the selected service in booking state
+  if (window.bookingState) {
+    window.bookingState.selectedService = null;
+  }
+  
+  // Service mapping for display names
+  const serviceNames = {
+    'in_person_therapy': 'In-Person Therapy',
+    'online_therapy': 'Online Therapy',
+    'psychometric_mmpi2': 'Psychometric Evaluation MMPI-2',
+    'psychometric_wisc': 'Psychometric Evaluation WISC',
+    'psychometric_wais': 'Psychometric Evaluation WAIS',
+    'teen_counseling': 'Teen Counseling',
+    'parents_counseling': 'Parents Counseling',
+    'couples_therapy': 'Couples Therapy'
+  };
+  
+  // Get available services for this therapist - handle multiple data formats
+  const availableServices = [];
+  if (therapist.services) {
+    if (Array.isArray(therapist.services)) {
+      // Array format: ["In-Person Therapy", "Online Therapy"]
+      therapist.services.forEach(service => {
+        const serviceName = service;
+        availableServices.push({
+          key: serviceName.toLowerCase().replace(/[\s-]+/g, '_'),
+          name: serviceName,
+          price: therapist.cost || 75,
+          description: `Professional ${serviceName.toLowerCase()} with Dr. ${therapist.first_name} ${therapist.last_name}`,
+          duration: 1
+        });
+      });
+    } else if (typeof therapist.services === 'object') {
+      for (const [key, serviceData] of Object.entries(therapist.services)) {
+        let isAvailable = false;
+        let serviceInfo = {};
+        
+        if (typeof serviceData === 'object' && serviceData !== null) {
+          // Detailed object format: { available: true, price: 75, ... }
+          isAvailable = serviceData.available;
+          serviceInfo = serviceData;
+        } else {
+          // Simple boolean format: true/false
+          isAvailable = serviceData === true;
+          serviceInfo = {
+            price: therapist.cost || 75,
+            description: `Professional ${(serviceNames[key] || key).toLowerCase()} with Dr. ${therapist.first_name} ${therapist.last_name}`,
+            duration: 1
+          };
+        }
+        
+        if (isAvailable && serviceNames[key]) {
+          // Create better descriptions for each service type
+          let enhancedDescription = serviceInfo.description;
+          if (key === 'in_person_therapy') {
+            enhancedDescription = `Face-to-face therapy sessions at the therapist's office`;
+          } else if (key === 'online_therapy') {
+            enhancedDescription = `Secure video therapy sessions from your home`;
+          } else if (key === 'psychometric_mmpi2') {
+            enhancedDescription = `Comprehensive personality assessment tool`;
+          } else if (key === 'psychometric_wisc' || key === 'psychometric_wais') {
+            enhancedDescription = `Intelligence and cognitive abilities assessment`;
+          } else if (key === 'teen_counseling') {
+            enhancedDescription = `Specialized therapy focused on adolescent issues`;
+          } else if (key === 'parents_counseling') {
+            enhancedDescription = `Support and guidance for parenting challenges`;
+          } else if (key === 'couples_therapy') {
+            enhancedDescription = `Relationship counseling for couples`;
+          }
+          
+          availableServices.push({
+            key: key,
+            name: serviceNames[key],
+            price: serviceInfo.price,
+            description: enhancedDescription,
+            location: serviceInfo.location,
+            platform: serviceInfo.platform,
+            duration: serviceInfo.duration
+          });
+        }
+      }
+    }
+  }
+  
+  if (availableServices.length === 0) {
+    container.innerHTML = `
+      <div class="col-span-full text-center py-8 text-gray-500">
+        <p>No specific services listed for this therapist.</p>
+        <p class="text-sm mt-1">Please contact them directly to discuss your needs.</p>
+      </div>
+    `;
+    return;
+  }
+  
+  // Create service selection buttons (narrower, horizontal design)
+  container.innerHTML = `
+    <div class="flex flex-col gap-2">
+      ${availableServices.map(service => {
+        return `
+          <button class="bg-gray-50 border border-gray-200 rounded-lg px-4 py-3 hover:bg-blue-50 hover:border-blue-300 cursor-pointer transition-all duration-200 service-option text-left w-full" 
+               data-service="${service.key}"
+               onclick="window.selectService('${service.key}', '${service.name}', ${service.price})">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-3">
+                <span class="font-medium text-gray-900 text-sm">${service.name}</span>
+                ${service.location ? `<span class="text-xs text-gray-500">(${service.location})</span>` : ''}
+                ${service.platform ? `<span class="text-xs text-gray-500">(${service.platform})</span>` : ''}
+              </div>
+              <div class="flex items-center gap-2">
+                <span class="text-sm font-semibold text-gray-700">€${service.price}</span>
+                <span class="text-xs text-gray-500 hidden sm:inline">per session</span>
+              </div>
+            </div>
+          </button>
+        `;
+      }).join('')}
+    </div>
+  `;
+  
+  console.log(`🎯 Generated ${availableServices.length} services for ${therapist.first_name} ${therapist.last_name}`);
+  
+  // Auto-select first service if only one available
+  if (availableServices.length === 1) {
+    setTimeout(() => {
+      window.selectService(availableServices[0].key, availableServices[0].name, availableServices[0].price);
+    }, 100);
+  } else if (availableServices.length === 0) {
+    console.warn('⚠️ No services found for therapist');
+  }
+};
+
+// Select a service
+window.selectService = function(serviceKey, serviceName, servicePrice) {
+  // Remove selection from all service options and show all services
+  document.querySelectorAll('.service-option').forEach(option => {
+    option.classList.remove('border-blue-500', 'bg-blue-50', 'ring-2', 'ring-blue-200', 'hidden');
+    option.classList.add('border-gray-200', 'bg-gray-50');
+  });
+  
+  // Add selection to clicked option
+  const selectedOption = document.querySelector(`[data-service="${serviceKey}"]`);
+  if (selectedOption) {
+    selectedOption.classList.remove('border-gray-200', 'bg-gray-50');
+    selectedOption.classList.add('border-blue-500', 'bg-blue-50', 'ring-2', 'ring-blue-200');
+  }
+  
+  // Hide non-selected services and add "Change Service" button
+  const container = document.getElementById('booking-services-container');
+  if (container) {
+    // Hide other services
+    document.querySelectorAll('.service-option').forEach(option => {
+      if (option.dataset.service !== serviceKey) {
+        option.classList.add('hidden');
+      }
+    });
+    
+    // Add change service button if not already present
+    let changeButton = container.querySelector('.change-service-btn');
+    if (!changeButton) {
+      changeButton = document.createElement('button');
+      changeButton.className = 'change-service-btn mt-2 text-sm text-blue-600 hover:text-blue-700 font-medium w-full text-left px-4 py-2';
+      changeButton.textContent = '+ Change Service';
+      changeButton.onclick = () => window.showAllServices();
+      // Append to the flex container inside booking-services-container
+      const flexContainer = container.querySelector('.flex-col');
+      if (flexContainer) {
+        flexContainer.appendChild(changeButton);
+      } else {
+        container.appendChild(changeButton);
+      }
+    }
+  }
+  
+  // Store selected service
+  const therapist = window.bookingState.currentTherapist;
+  let serviceDuration = 1; // default duration
+  
+  if (therapist && therapist.services && therapist.services[serviceKey] && therapist.services[serviceKey].duration) {
+    serviceDuration = therapist.services[serviceKey].duration;
+  }
+  
+  console.log(`📋 Service selected: ${serviceName}, Duration: ${serviceDuration} hours, Price: €${servicePrice}`);
+  
+  window.bookingState.selectedService = {
+    key: serviceKey,
+    name: serviceName,
+    price: servicePrice,
+    duration: serviceDuration
+  };
+  
+  // Show service notes and booking sections
+  window.showServiceNotes(serviceKey, serviceName, serviceDuration);
+  window.showBookingSections();
+  
+  // CRITICAL: Ensure sections are visible by also removing display:none
+  const sectionsToShow = ['service-notes-section', 'quick-appointments-section', 'calendar-section'];
+  sectionsToShow.forEach(sectionId => {
+    const section = document.getElementById(sectionId);
+    if (section) {
+      section.classList.remove('hidden');
+      section.style.display = '';
+      console.log(`✅ Ensured ${sectionId} is visible after service selection`);
+    }
+  });
+  
+  // Update calendar availability when service changes - ENHANCED WITH DEBUGGING
+  console.log(`🔄 SERVICE CHANGE: Reloading calendar for new service duration: ${serviceDuration} hours`);
+  window.renderCalendar();
+  console.log(`✅ SERVICE CHANGE: Calendar reloaded`);
+  
+  // FIXED: Also refresh time slots for currently selected date
+  if (window.bookingState.selectedDate) {
+    console.log(`🕐 SERVICE CHANGE: Refreshing time slots for selected date: ${window.bookingState.selectedDate}`);
+    window.showTimeSlotsForDate(window.bookingState.selectedDate);
+    console.log(`✅ SERVICE CHANGE: Time slots refreshed for new service duration`);
+  } else {
+    console.log(`ℹ️ SERVICE CHANGE: No date selected, time slots will refresh when date is selected`);
+  }
+  
+  // TIMEZONE-SAFE DATE STRING FUNCTION
+  window.getLocalDateString = function(date) {
+    // Create date string in local timezone instead of UTC to avoid date shifts
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    const localDateStr = `${year}-${month}-${day}`;
+    
+    console.log(`🌍 TIMEZONE SAFE: Converting ${date.toString()} to local date string: ${localDateStr}`);
+    return localDateStr;
+  };
+
+  console.log('✅ Service selected:', serviceName, '€' + servicePrice);
+};
+
+// Show all services function
+window.showAllServices = function() {
+  // Show all service options
+  document.querySelectorAll('.service-option').forEach(option => {
+    option.classList.remove('hidden');
+  });
+  
+  // Remove change service button
+  const changeButton = document.querySelector('.change-service-btn');
+  if (changeButton) {
+    changeButton.remove();
+  }
+  
+  console.log('✅ All services shown');
+};
+
+// Show service-specific important notes
+window.showServiceNotes = function(serviceKey, serviceName, duration) {
+  const notesSection = document.getElementById('service-notes-section');
+  const notesContent = document.getElementById('service-notes-content');
+  
+  if (!notesSection || !notesContent) return;
+  
+  let noteText = '';
+  
+  if (serviceKey === 'psychometric_wais' || serviceKey === 'psychometric_wisc') {
+    noteText = `Duration: 3 hours consecutive`;
+  } else if (serviceKey === 'psychometric_mmpi2') {
+    noteText = `Duration: 2 hours consecutive`;
+  } else if (serviceKey === 'in_person_therapy' || serviceKey === 'online_therapy') {
+    noteText = `Duration: 45-50 minutes`;
+  } else if (serviceKey === 'couples_therapy') {
+    noteText = `Duration: 60-75 minutes`;
+  } else if (serviceKey === 'teen_counseling') {
+    noteText = `Duration: 45-60 minutes`;
+  } else if (serviceKey === 'parents_counseling') {
+    noteText = `Duration: 50-60 minutes`;
+  } else {
+    noteText = `Duration: 45-60 minutes`;
+  }
+  
+  notesContent.innerHTML = `<p>${noteText}</p>`;
+  notesSection.classList.remove('hidden');
+};
+
+// Show booking sections after service selection
+window.showBookingSections = function() {
+  const quickSection = document.getElementById('quick-appointments-section');
+  const calendarSection = document.getElementById('calendar-section');
+  
+  if (quickSection) {
+    quickSection.classList.remove('hidden');
+  }
+  
+  if (calendarSection) {
+    calendarSection.classList.remove('hidden');
+    // Reinitialize calendar navigation when calendar becomes visible
+    setTimeout(() => {
+      window.setupCalendarNavigation();
+      console.log('📅 Calendar navigation reinitialized after showing calendar');
+    }, 100);
+  }
+  
+  // Load quick appointments when sections are shown
+  window.loadQuickAppointments(window.bookingState.currentTherapist);
+};
+
+// Hide booking sections initially
+window.hideBookingSections = function() {
+  const quickSection = document.getElementById('quick-appointments-section');
+  const calendarSection = document.getElementById('calendar-section');
+  const notesSection = document.getElementById('service-notes-section');
+  
+  if (quickSection) {
+    quickSection.classList.add('hidden');
+  }
+  
+  if (calendarSection) {
+    calendarSection.classList.add('hidden');
+  }
+  
+  if (notesSection) {
+    notesSection.classList.add('hidden');
+  }
+};
+
+// Load quick appointments (next 3 available)
+window.loadQuickAppointments = function(therapist) {
+  const container = document.getElementById('quick-appointments-container');
+  if (!container) return;
+  
+  const therapistId = therapist.id || window.therapistData.indexOf(therapist);
+  const serviceDuration = window.bookingState.selectedService ? window.bookingState.selectedService.duration : 1;
+  
+  console.log(`🕐 QUICK BOOKING: Loading appointments for therapist ${therapistId} (Dr. ${therapist.first_name} ${therapist.last_name})`);
+  console.log(`📊 QUICK BOOKING: Service duration: ${serviceDuration} hours`);
+  console.log(`📅 QUICK BOOKING: Availability data exists:`, !!window.therapistAvailability[therapistId]);
+  
+  // ENSURE CONSISTENCY: Use the EXACT same logic as calendar
+  let quickAppointments = [];
+  
+  if (serviceDuration === 1) {
+    quickAppointments = window.getNextAvailableAppointments(therapistId, 3);
+    console.log(`🎯 QUICK BOOKING: Single-hour search found ${quickAppointments.length} appointments`);
+  } else {
+    quickAppointments = window.getNextAvailableMultiHourAppointments(therapistId, serviceDuration, 3);
+    console.log(`🎯 QUICK BOOKING: Multi-hour (${serviceDuration}h) search found ${quickAppointments.length} appointments`);
+  }
+  
+  // VALIDATION: Verify each appointment would also appear in calendar
+  if (quickAppointments.length > 0) {
+    console.log('🔍 QUICK BOOKING: Validating appointments against calendar logic...');
+    quickAppointments.forEach((appt, index) => {
+      const dateAvailability = window.getAvailabilityForDate(therapistId, appt.date);
+      if (dateAvailability && dateAvailability[appt.hour]) {
+        const slot = dateAvailability[appt.hour];
+        console.log(`   ✅ Appointment ${index + 1}: ${appt.date} ${appt.hour}:00 - Calendar compatible: ${slot.available && !slot.booked}`);
+      } else {
+        console.log(`   ❌ Appointment ${index + 1}: ${appt.date} ${appt.hour}:00 - NOT found in calendar data!`);
+      }
+    });
+  }
+  
+  if (quickAppointments.length === 0) {
+    console.log('❌ QUICK BOOKING: No appointments found - detailed analysis...');
+    const availabilityData = window.therapistAvailability[therapistId];
+    if (availabilityData) {
+      const todayStr = new Date().toISOString().split('T')[0];
+      const tomorrowStr = new Date(Date.now() + 24*60*60*1000).toISOString().split('T')[0];
+      console.log('📊 Today availability sample:', availabilityData[todayStr]);
+      console.log('📊 Tomorrow availability sample:', availabilityData[tomorrowStr]);
+    }
+  }
+  
+  if (quickAppointments.length === 0) {
+    container.innerHTML = `
+      <div class="col-span-full text-center py-8 text-gray-500">
+        <span class="material-icons text-3xl mb-2">event_busy</span>
+        <p>No immediate appointments available. Please check the calendar below.</p>
+      </div>
+    `;
+    return;
+  }
+  
+  container.innerHTML = quickAppointments.map(appointment => `
+    <div class="bg-white rounded-xl p-4 border border-blue-200 hover:border-blue-400 cursor-pointer transition-all duration-300 hover:shadow-lg shadow-md" 
+         onclick="window.selectQuickAppointment('${appointment.date}', ${appointment.hour}, ${appointment.duration || 1})">
+      <div class="text-center">
+        <div class="text-sm font-medium text-gray-800 mb-1">${appointment.formatted.date}</div>
+        <div class="text-lg font-semibold text-blue-600 mb-1">${appointment.formatted.time}</div>
+        <div class="text-xs text-gray-500">${appointment.formatted.period}</div>
+      </div>
+    </div>
+  `).join('');
+};
+
+// Select a quick appointment
+window.selectQuickAppointment = function(date, hour, duration = null) {
+  window.bookingState.selectedDate = date;
+  window.bookingState.selectedTime = hour;
+  if (duration) {
+    window.bookingState.selectedDuration = duration;
+  }
+  window.showAppointmentSummary();
+};
+
+// Initialize calendar
+window.initializeCalendar = function() {
+  const today = new Date();
+  window.bookingState.currentMonth = today.getMonth();
+  window.bookingState.currentYear = today.getFullYear();
+  
+  window.renderCalendar();
+  window.setupCalendarNavigation();
+};
+
+// Setup calendar navigation
+window.setupCalendarNavigation = function() {
+  // Desktop navigation buttons
+  const prevBtn = document.getElementById('calendar-prev-month');
+  const nextBtn = document.getElementById('calendar-next-month');
+  
+  // Mobile navigation buttons
+  const prevBtnMobile = document.getElementById('calendar-prev-month-mobile');
+  const nextBtnMobile = document.getElementById('calendar-next-month-mobile');
+  
+  // Function to handle previous month
+  const handlePrevMonth = () => {
+    console.log('📅 Previous month clicked');
+    window.bookingState.currentMonth--;
+    if (window.bookingState.currentMonth < 0) {
+      window.bookingState.currentMonth = 11;
+      window.bookingState.currentYear--;
+    }
+    console.log(`📅 New date: ${window.bookingState.currentMonth + 1}/${window.bookingState.currentYear}`);
+    window.renderCalendar();
+  };
+  
+  // Function to handle next month
+  const handleNextMonth = () => {
+    console.log('📅 Next month clicked');
+    window.bookingState.currentMonth++;
+    if (window.bookingState.currentMonth > 11) {
+      window.bookingState.currentMonth = 0;
+      window.bookingState.currentYear++;
+    }
+    console.log(`📅 New date: ${window.bookingState.currentMonth + 1}/${window.bookingState.currentYear}`);
+    window.renderCalendar();
+  };
+  
+  // Setup desktop navigation
+  if (prevBtn) {
+    prevBtn.replaceWith(prevBtn.cloneNode(true));
+    const newPrevBtn = document.getElementById('calendar-prev-month');
+    newPrevBtn.addEventListener('click', handlePrevMonth);
+  }
+  
+  if (nextBtn) {
+    nextBtn.replaceWith(nextBtn.cloneNode(true));
+    const newNextBtn = document.getElementById('calendar-next-month');
+    newNextBtn.addEventListener('click', handleNextMonth);
+  }
+  
+  // Setup mobile navigation
+  if (prevBtnMobile) {
+    prevBtnMobile.replaceWith(prevBtnMobile.cloneNode(true));
+    const newPrevBtnMobile = document.getElementById('calendar-prev-month-mobile');
+    newPrevBtnMobile.addEventListener('click', handlePrevMonth);
+  }
+  
+  if (nextBtnMobile) {
+    nextBtnMobile.replaceWith(nextBtnMobile.cloneNode(true));
+    const newNextBtnMobile = document.getElementById('calendar-next-month-mobile');
+    newNextBtnMobile.addEventListener('click', handleNextMonth);
+  }
+  
+  console.log('✅ Calendar navigation setup complete');
+};
+
+// Render calendar
+window.renderCalendar = function() {
+  const monthNames = [
+    'January', 'February', 'March', 'April', 'May', 'June',
+    'July', 'August', 'September', 'October', 'November', 'December'
+  ];
+  
+  // Update month/year display for both desktop and mobile
+  const monthYearElement = document.getElementById('calendar-month-year');
+  const monthYearElementMobile = document.getElementById('calendar-month-year-mobile');
+  const displayText = `${monthNames[window.bookingState.currentMonth]} ${window.bookingState.currentYear}`;
+  
+  if (monthYearElement) {
+    monthYearElement.textContent = displayText;
+  }
+  
+  if (monthYearElementMobile) {
+    monthYearElementMobile.textContent = displayText;
+  }
+  
+  // Render calendar days
+  const container = document.getElementById('calendar-days-container');
+  if (!container) return;
+  
+  const firstDay = new Date(window.bookingState.currentYear, window.bookingState.currentMonth, 1);
+  const lastDay = new Date(window.bookingState.currentYear, window.bookingState.currentMonth + 1, 0);
+  const today = new Date();
+  
+  let html = '';
+  
+  // Empty cells for days before the first day of the month
+  for (let i = 0; i < firstDay.getDay(); i++) {
+    html += '<div class="p-2"></div>';
+  }
+  
+  // Days of the month - FIXED DATE STRING GENERATION
+  console.log(`📅 CALENDAR: Generating ${lastDay.getDate()} days for ${window.bookingState.currentYear}-${window.bookingState.currentMonth + 1}`);
+  
+  for (let day = 1; day <= lastDay.getDate(); day++) {
+    const currentDate = new Date(window.bookingState.currentYear, window.bookingState.currentMonth, day);
+    
+    // FIXED: Simple date string creation to avoid timezone issues
+    const year = currentDate.getFullYear();
+    const month = String(currentDate.getMonth() + 1).padStart(2, '0');
+    const dayStr = String(currentDate.getDate()).padStart(2, '0');
+    const dateStr = `${year}-${month}-${dayStr}`;
+    
+    const isPast = currentDate < today;
+    const isToday = currentDate.toDateString() === today.toDateString();
+    
+    // Check availability for this date based on selected service duration
+    const therapistId = window.bookingState.currentTherapist?.id || window.therapistData.indexOf(window.bookingState.currentTherapist);
+    const serviceDuration = window.bookingState.selectedService ? window.bookingState.selectedService.duration : 1;
+    
+    // Calculate minimum booking time (8 hours from now)
+    const now = new Date();
+    const minimumBookingTime = new Date(now.getTime() + (8 * 60 * 60 * 1000));
+    
+    let hasAvailability = false;
+    if (serviceDuration === 1) {
+      // For 1-hour services, check individual slots that are 8+ hours away
+      const dayAvailability = window.getAvailabilityForDate(therapistId, dateStr);
+      if (dayAvailability) {
+        let availableCount = 0;
+        hasAvailability = Object.entries(dayAvailability).some(([hour, slot]) => {
+          const slotDateTime = new Date(currentDate);
+          slotDateTime.setHours(parseInt(hour), 0, 0, 0);
+          const isValidSlot = slot.available && !slot.booked && slotDateTime > minimumBookingTime;
+          if (isValidSlot) availableCount++;
+          return isValidSlot;
+        });
+        if (availableCount > 0) {
+          console.log(`📅 ${dateStr}: Found ${availableCount} available 1h slots (8+ hours away)`);
+        }
+      }
+    } else {
+      // For multi-hour services, check for consecutive availability 8+ hours away
+      const availableSlots = window.getAvailableSlotsForDuration(therapistId, dateStr, serviceDuration);
+      const validSlots = availableSlots.filter(slot => {
+        const slotDateTime = new Date(currentDate);
+        slotDateTime.setHours(slot.startHour, 0, 0, 0);
+        return slotDateTime > minimumBookingTime;
+      });
+      hasAvailability = validSlots.length > 0;
+      if (hasAvailability) {
+        console.log(`📅 ${dateStr}: Found ${validSlots.length} available ${serviceDuration}h slots (8+ hours away)`);
+      }
+    }
+    
+    let classes = 'p-2 text-center text-sm rounded-lg cursor-pointer transition-all duration-200 border min-h-[40px] flex items-center justify-center ';
+    
+    if (isPast) {
+      classes += 'text-gray-300 cursor-not-allowed border-transparent';
+    } else if (isToday) {
+      classes += 'bg-blue-500 text-white font-semibold border-blue-500';
+    } else if (hasAvailability) {
+      classes += 'hover:bg-blue-50 text-gray-700 border-gray-200 hover:border-blue-400 font-medium';
+    } else {
+      classes += 'text-gray-400 cursor-not-allowed border-transparent';
+    }
+    
+    const clickHandler = isPast || !hasAvailability ? '' : `onclick="window.selectCalendarDate('${dateStr}')"`;
+    
+    html += `
+      <div class="${classes}" ${clickHandler}>
+        <div class="flex flex-col items-center">
+          <div class="font-semibold">${day}</div>
+          ${hasAvailability && !isPast && !isToday ? '<div class="w-1 h-1 bg-blue-500 rounded-full mt-1"></div>' : ''}
+        </div>
+      </div>
+    `;
+  }
+  
+  console.log(`📅 CALENDAR: Generated ${lastDay.getDate()} days, HTML length: ${html.length}`);
+  
+  container.innerHTML = html;
+  
+  console.log(`✅ CALENDAR: Rendered calendar with ${container.children.length} day elements`);
+};
+
+// Select a calendar date - ENHANCED WITH DEBUGGING
+window.selectCalendarDate = function(dateStr) {
+  console.log(`📅 CALENDAR DEBUG: selectCalendarDate called with dateStr: "${dateStr}"`);
+  console.log(`📅 CALENDAR DEBUG: Booking state - currentYear: ${window.bookingState.currentYear}, currentMonth: ${window.bookingState.currentMonth}`);
+  
+  // Verify the date is correct
+  const selectedDate = new Date(dateStr);
+  console.log(`📅 CALENDAR DEBUG: Parsed date object: ${selectedDate.toString()}`);
+  console.log(`📅 CALENDAR DEBUG: Date components - Year: ${selectedDate.getFullYear()}, Month: ${selectedDate.getMonth()}, Day: ${selectedDate.getDate()}`);
+  
+  window.bookingState.selectedDate = dateStr;
+  console.log(`📅 CALENDAR DEBUG: Stored selectedDate: ${window.bookingState.selectedDate}`);
+  
+  window.showTimeSlotsForDate(dateStr);
+};
+
+// Show time slots for selected date
+window.showTimeSlotsForDate = function(dateStr) {
+  const container = document.getElementById('time-slots-container');
+  const dateDisplay = document.getElementById('selected-date-display');
+  
+  if (!container) return;
+  
+  // Update date display
+  const date = new Date(dateStr);
+  if (dateDisplay) {
+    dateDisplay.textContent = date.toLocaleDateString('en-US', { 
+      weekday: 'long', 
+      year: 'numeric', 
+      month: 'long', 
+      day: 'numeric' 
+    });
+  }
+  
+  // Get availability for this date
+  const therapistId = window.bookingState.currentTherapist?.id || window.therapistData.indexOf(window.bookingState.currentTherapist);
+  const serviceDuration = window.bookingState.selectedService ? window.bookingState.selectedService.duration : 1;
+  const serviceName = window.bookingState.selectedService ? window.bookingState.selectedService.name : 'Default Service';
+  
+  console.log(`🕐 TIME SLOTS: Showing slots for ${dateStr} - Service: "${serviceName}" (${serviceDuration} hours)`);
+  
+  if (serviceDuration === 1) {
+    // Handle 1-hour appointments (existing logic)
+    console.log(`🕐 TIME SLOTS: Using single-hour slots for ${serviceName}`);
+    window.showSingleHourSlots(therapistId, dateStr);
+  } else {
+    // Handle multi-hour appointments
+    console.log(`🕐 TIME SLOTS: Using multi-hour slots for ${serviceName} (${serviceDuration} hours)`);
+    window.showMultiHourSlots(therapistId, dateStr, serviceDuration);
+  }
+  
+  container.classList.remove('hidden');
+};
+
+// Show individual hour slots for 1-hour services
+window.showSingleHourSlots = function(therapistId, dateStr) {
+  console.log(`🕐 CALENDAR: Showing slots for therapist ${therapistId} on ${dateStr}`);
+  
+  const availability = window.getAvailabilityForDate(therapistId, dateStr);
+  
+  if (!availability) {
+    console.log(`❌ CALENDAR: No availability data for ${therapistId} on ${dateStr}`);
+    const container = document.getElementById('time-slots-container');
+    container.innerHTML = '<div class="text-center py-4 text-gray-500">No availability data for this date</div>';
+    return;
+  }
+  
+  // Calculate minimum booking time (8 hours from now) - SAME AS QUICK BOOKING
+  const now = new Date();
+  const minimumBookingTime = new Date(now.getTime() + (8 * 60 * 60 * 1000));
+  const selectedDate = new Date(dateStr);
+  
+  console.log(`⏰ CALENDAR: Current time: ${now.toISOString()}`);
+  console.log(`⏰ CALENDAR: Minimum booking time: ${minimumBookingTime.toISOString()}`);
+  console.log(`⏰ CALENDAR: Selected date: ${selectedDate.toISOString()}`);
+  
+  // Debug: Check all available slots for this day
+  let totalDaySlots = 0;
+  let validDaySlots = 0;
+  for (let debugHour = 7; debugHour <= 23; debugHour++) {
+    const debugSlot = availability[debugHour];
+    if (debugSlot && debugSlot.available && !debugSlot.booked) {
+      totalDaySlots++;
+      const debugSlotDateTime = new Date(selectedDate);
+      debugSlotDateTime.setHours(debugHour, 0, 0, 0);
+      if (debugSlotDateTime > minimumBookingTime) {
+        validDaySlots++;
+      }
+    }
+  }
+  console.log(`📊 CALENDAR: ${dateStr} has ${totalDaySlots} total available slots, ${validDaySlots} valid (8+ hours away)`);
+  
+  // Group slots by time period
+  const periods = ['morning', 'noon', 'afternoon', 'evening', 'night'];
+  
+  periods.forEach(period => {
+    const periodContainer = document.getElementById(`${period}-slots`);
+    const periodSlotsContainer = periodContainer?.querySelector(`[data-period="${period}"]`);
+    
+    if (!periodSlotsContainer) return;
+    
+    const slots = [];
+    
+    // Find slots for this period that are 8+ hours away
+    for (let hour = 7; hour <= 23; hour++) {
+      const slot = availability[hour];
+      if (slot && slot.period === period && slot.available && !slot.booked) {
+        // Check if this slot is 8+ hours from now
+        const slotDateTime = new Date(selectedDate);
+        slotDateTime.setHours(hour, 0, 0, 0);
+        
+        if (slotDateTime > minimumBookingTime) {
+          slots.push({ hour, ...slot });
+        } else {
+          console.log(`⏰ Skipping slot ${hour}:00 on ${dateStr} - only ${((slotDateTime - now) / (1000 * 60 * 60)).toFixed(1)} hours away (need 8+ hours)`);
+        }
+      }
+    }
+    
+    if (slots.length > 0) {
+      periodContainer.classList.remove('hidden');
+      periodSlotsContainer.innerHTML = slots.map(slot => `
+        <button class="bg-white border border-gray-200 rounded-lg px-3 py-2 text-xs font-medium text-gray-700 hover:border-blue-500 hover:bg-blue-50 hover:text-blue-700 transition-all duration-200 text-center"
+                onclick="window.selectTimeSlot('${dateStr}', ${slot.hour})">
+          ${slot.hour.toString().padStart(2, '0')}:00
+        </button>
+      `).join('');
+    } else {
+      periodContainer.classList.add('hidden');
+    }
+  });
+};
+
+// Show multi-hour slots for longer services
+window.showMultiHourSlots = function(therapistId, dateStr, duration) {
+  const availableSlots = window.getAvailableSlotsForDuration(therapistId, dateStr, duration);
+  
+  // Calculate minimum booking time (8 hours from now)
+  const now = new Date();
+  const minimumBookingTime = new Date(now.getTime() + (8 * 60 * 60 * 1000));
+  const selectedDate = new Date(dateStr);
+  
+  // Filter slots to only include those 8+ hours away
+  const validSlots = availableSlots.filter(slot => {
+    const slotDateTime = new Date(selectedDate);
+    slotDateTime.setHours(slot.startHour, 0, 0, 0);
+    return slotDateTime > minimumBookingTime;
+  });
+  
+  if (validSlots.length === 0) {
+    const container = document.getElementById('time-slots-container');
+    container.innerHTML = '<div class="text-center py-4 text-gray-500">No consecutive time blocks available for this service duration (8+ hours advance notice required)</div>';
+    return;
+  }
+  
+  // Group consecutive slots by time period of their start time
+  const periods = ['morning', 'noon', 'afternoon', 'evening', 'night'];
+  
+  periods.forEach(period => {
+    const periodContainer = document.getElementById(`${period}-slots`);
+    const periodSlotsContainer = periodContainer?.querySelector(`[data-period="${period}"]`);
+    
+    if (!periodSlotsContainer) return;
+    
+    // Find slots that start in this period
+    const periodSlots = validSlots.filter(slot => {
+      const startPeriod = window.getTimePeriod(slot.startHour);
+      return startPeriod === period;
+    });
+    
+    if (periodSlots.length > 0) {
+      periodContainer.classList.remove('hidden');
+      periodSlotsContainer.innerHTML = periodSlots.map(slot => `
+        <button class="bg-white border border-gray-200 rounded-lg px-3 py-2 text-xs font-medium text-gray-700 hover:border-blue-500 hover:bg-blue-50 hover:text-blue-700 transition-all duration-200 text-center"
+                onclick="window.selectTimeSlot('${dateStr}', ${slot.startHour}, ${slot.duration})">
+          <div class="font-semibold">${slot.startHour.toString().padStart(2, '0')}:00-${(slot.endHour + 1).toString().padStart(2, '0')}:00</div>
+          <div class="text-xs text-gray-500">${duration}h</div>
+        </button>
+      `).join('');
+    } else {
+      periodContainer.classList.add('hidden');
+    }
+  });
+};
+
+// Select a time slot
+window.selectTimeSlot = function(dateStr, hour, duration = 1) {
+  window.bookingState.selectedDate = dateStr;
+  window.bookingState.selectedTime = hour;
+  window.bookingState.selectedDuration = duration;
+  window.showAppointmentSummary();
+};
+
+// Show appointment summary
+window.showAppointmentSummary = function() {
+  const container = document.getElementById('appointment-summary');
+  const detailsContainer = document.getElementById('appointment-details');
+  
+  if (!container || !detailsContainer) return;
+  
+    const therapist = window.bookingState.currentTherapist;
+  const date = new Date(window.bookingState.selectedDate);
+  const hour = window.bookingState.selectedTime;
+  
+  // Get slot details and therapist name
+  const therapistId = therapist.id || window.therapistData.indexOf(therapist);
+  const availability = window.getAvailabilityForDate(therapistId, window.bookingState.selectedDate);
+  const slot = availability[hour];
+  const fullName = `Dr. ${therapist.first_name} ${therapist.last_name}`;
+  
+  // Determine if it's online therapy
+  const selectedService = window.bookingState.selectedService;
+  const isOnlineTherapy = selectedService && selectedService.key === 'online_therapy';
+  
+  // Modern minimal Apple-like design with consistent fonts and styling
+  detailsContainer.innerHTML = `
+    <!-- Clean Summary Grid -->
+    <div class="grid grid-cols-1 gap-4">
+      <!-- Main Info Card -->
+      <div class="bg-white/60 backdrop-blur-sm rounded-2xl p-6 border border-gray-100/50">
+        <!-- Mobile: Photo above text, Desktop: Side by side -->
+        <div class="flex flex-col sm:flex-row sm:items-start gap-4">
+          <div class="flex-shrink-0 mx-auto sm:mx-0">
+            <div class="w-14 h-14 rounded-2xl overflow-hidden border-2 border-white shadow-sm">
+              <img src="${therapist.image}" alt="${fullName}" class="w-full h-full object-cover"/>
+            </div>
+          </div>
+          <div class="flex-1 min-w-0 text-center sm:text-left">
+            <h4 class="text-base font-semibold text-gray-900 mb-1" style="font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', system-ui, sans-serif;">${fullName}</h4>
+            <p class="text-sm text-gray-500 mb-3" style="font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', system-ui, sans-serif;">${therapist.title}</p>
+            
+            <!-- Service & Price -->
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+              <div>
+                <p class="text-sm font-medium text-gray-900 mb-1" style="font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', system-ui, sans-serif;">${selectedService ? selectedService.name : 'Individual Therapy'}</p>
+                <p class="text-sm text-gray-500" style="font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', system-ui, sans-serif;">${window.bookingState.selectedDuration || 1} ${(window.bookingState.selectedDuration || 1) === 1 ? 'hour' : 'hours'}</p>
+              </div>
+              <div class="sm:text-right">
+                <p class="text-lg font-semibold text-gray-900" style="font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', system-ui, sans-serif; font-variant-numeric: tabular-nums;">€${selectedService ? selectedService.price : slot.price}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Date & Time Card -->
+      <div class="bg-white/60 backdrop-blur-sm rounded-2xl p-4 border border-gray-100/50">
+        <!-- Mobile: Icon above text, Desktop: Side by side -->
+        <div class="flex flex-col sm:flex-row sm:items-center gap-3">
+          <div class="flex-shrink-0 mx-auto sm:mx-0 w-10 h-10 bg-gray-50 rounded-lg flex items-center justify-center">
+            <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+            </svg>
+          </div>
+          <div class="flex-1 text-center sm:text-left">
+            <p class="text-sm font-medium text-gray-900 mb-1" style="font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', system-ui, sans-serif;">${date.toLocaleDateString('en-US', { 
+              weekday: 'long', 
+              month: 'long', 
+              day: 'numeric' 
+            })}</p>
+            <p class="text-sm text-gray-500" style="font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', system-ui, sans-serif; font-variant-numeric: tabular-nums;">${hour.toString().padStart(2, '0')}:00 – ${(hour + window.bookingState.selectedDuration).toString().padStart(2, '0')}:00</p>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Location/Format -->
+      <div class="bg-white/60 backdrop-blur-sm rounded-2xl p-4 border border-gray-100/50">
+        <!-- Mobile: Icon above text, Desktop: Side by side -->
+        <div class="flex flex-col sm:flex-row sm:items-center gap-3">
+          <div class="flex-shrink-0 mx-auto sm:mx-0 w-10 h-10 bg-gray-50 rounded-lg flex items-center justify-center">
+            <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              ${isOnlineTherapy ? 
+                '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>' :
+                '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>'
+              }
+            </svg>
+          </div>
+          <div class="flex-1 text-center sm:text-left">
+            <p class="text-sm font-medium text-gray-900 mb-1" style="font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', system-ui, sans-serif;">
+              ${isOnlineTherapy ? 'Online Session' : 'In-Person Visit'}
+            </p>
+            <p class="text-sm text-gray-500" style="font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', system-ui, sans-serif;">
+              ${isOnlineTherapy ? 
+                'You will receive a meeting link via email' : 
+                therapist.address || `${therapist.city}, ${therapist.area}`
+              }
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+  
+  container.classList.remove('hidden');
+  container.scrollIntoView({ behavior: 'smooth', block: 'center' });
+};
+
+// Clear selected appointment
+window.clearSelectedAppointment = function() {
+  window.bookingState.selectedDate = null;
+  window.bookingState.selectedTime = null;
+  window.bookingState.selectedDuration = 1;
+  
+  const container = document.getElementById('appointment-summary');
+  if (container) {
+    container.classList.add('hidden');
+  }
+  
+  // Hide time slots
+  const timeSlotsContainer = document.getElementById('time-slots-container');
+  if (timeSlotsContainer) {
+    timeSlotsContainer.classList.add('hidden');
+  }
+};
+
+// Confirm booking
+window.confirmBooking = function() {
+  const therapist = window.bookingState.currentTherapist;
+  const dateStr = window.bookingState.selectedDate;
+  const hour = window.bookingState.selectedTime;
+  
+  if (!therapist || !dateStr || hour === null) {
+    alert('Please select an appointment time first.');
+    return;
+  }
+  
+  // Book the appointment (single or multi-hour)
+  const therapistId = therapist.id || window.therapistData.indexOf(therapist);
+  const duration = window.bookingState.selectedDuration || 1;
+  
+  let success;
+  if (duration === 1) {
+    success = window.bookAppointment(therapistId, dateStr, hour);
+  } else {
+    success = window.bookConsecutiveSlots(therapistId, dateStr, hour, duration);
+  }
+  
+  if (success) {
+    // Show booking completion section
+    window.showBookingCompletion(therapist, dateStr, hour, duration);
+  } else {
+    alert('❌ Sorry, this appointment slot is no longer available. Please select another time.');
+    
+    // Refresh the display
+    window.initializeBooking(therapist);
+  }
+};
+
+// Go back from booking step
+window.goBackFromBooking = function() {
+  console.log('🔙 Going back from booking step - resetting all booking state');
+  
+  // COMPLETELY RESET BOOKING STATE
+  window.bookingState = {
+    currentTherapist: null,
+    selectedDate: null,
+    selectedTime: null,
+    selectedDuration: 1,
+    selectedService: null,
+    currentMonth: new Date().getMonth(),
+    currentYear: new Date().getFullYear()
+  };
+  
+  // Hide booking step
+  const bookingStep = document.getElementById('therapist-step-booking');
+  if (bookingStep) {
+    bookingStep.style.display = 'none';
+    bookingStep.classList.add('hidden');
+  }
+  
+  // Clear booking UI elements
+  const bookingTherapistInfo = document.getElementById('booking-therapist-info');
+  if (bookingTherapistInfo) {
+    bookingTherapistInfo.innerHTML = '';
+  }
+  
+  const bookingServicesContainer = document.getElementById('booking-services-container');
+  if (bookingServicesContainer) {
+    bookingServicesContainer.innerHTML = '';
+  }
+  
+  const appointmentSummary = document.getElementById('appointment-summary');
+  if (appointmentSummary) {
+    appointmentSummary.classList.add('hidden');
+  }
+  
+  const timeSlotsContainer = document.getElementById('time-slots-container');
+  if (timeSlotsContainer) {
+    timeSlotsContainer.classList.add('hidden');
+    timeSlotsContainer.innerHTML = '';  // Clear the content
+  }
+  
+  // IMPORTANT: Clear calendar days to ensure fresh render on next booking
+  const calendarDays = document.getElementById('calendar-days-container');
+  if (calendarDays) {
+    calendarDays.innerHTML = '';
+    console.log('✅ Calendar days cleared');
+  }
+  
+  // Clear quick appointments
+  const quickAppointments = document.getElementById('quick-appointments-container');
+  if (quickAppointments) {
+    quickAppointments.innerHTML = '';
+    console.log('✅ Quick appointments cleared');
+  }
+  
+  // Reset service selection
+  document.querySelectorAll('.service-option').forEach(option => {
+    option.classList.remove('border-blue-500', 'bg-blue-50', 'ring-2', 'ring-blue-200', 'hidden');
+    option.classList.add('border-gray-200', 'bg-gray-50');
+  });
+  
+  // Remove any change service buttons
+  const changeButton = document.querySelector('.change-service-btn');
+  if (changeButton) {
+    changeButton.remove();
+  }
+  
+  // Show the previous step based on where user came from
+  // Default to step 1 (therapist list) for better UX
+  const step1 = document.getElementById('therapist-step-1');
+  if (step1) {
+    step1.style.display = 'block';
+    step1.classList.remove('hidden');
+    step1.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  } else {
+    // Fallback to step 2 if step 1 not available
+    const step2 = document.getElementById('therapist-step-2');
+    if (step2) {
+      step2.style.display = 'block';
+      step2.classList.remove('hidden');
+      step2.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }
+  
+  console.log('✅ Returned from booking step with complete state reset');
+};
+
+// Generate Google Meets link
+window.generateMeetingLink = function() {
+  // Generate realistic Google Meets link with random meeting ID
+  const chars = 'abcdefghijklmnopqrstuvwxyz';
+  const numbers = '0123456789';
+  const part1 = Array.from({length: 3}, () => chars[Math.floor(Math.random() * chars.length)]).join('');
+  const part2 = Array.from({length: 4}, () => chars[Math.floor(Math.random() * chars.length)]).join('');
+  const part3 = Array.from({length: 3}, () => chars[Math.floor(Math.random() * chars.length)]).join('');
+  
+  return `https://meet.google.com/${part1}-${part2}-${part3}`;
+};
+
+// Copy meeting link to clipboard
+window.copyMeetingLink = function(link) {
+  if (navigator.clipboard && window.isSecureContext) {
+    // Modern clipboard API
+    navigator.clipboard.writeText(link).then(() => {
+      showCopyFeedback('Meeting link copied!');
+    }).catch(() => {
+      fallbackCopyTextToClipboard(link);
+    });
+  } else {
+    // Fallback for older browsers
+    fallbackCopyTextToClipboard(link);
+  }
+};
+
+// Fallback copy method
+function fallbackCopyTextToClipboard(text) {
+  const textArea = document.createElement("textarea");
+  textArea.value = text;
+  textArea.style.position = "fixed";
+  textArea.style.left = "-999999px";
+  textArea.style.top = "-999999px";
+  document.body.appendChild(textArea);
+  textArea.focus();
+  textArea.select();
+  
+  try {
+    document.execCommand('copy');
+    showCopyFeedback('Meeting link copied!');
+  } catch (err) {
+    showCopyFeedback('Unable to copy link');
+  }
+  
+  document.body.removeChild(textArea);
+}
+
+// Show copy feedback
+function showCopyFeedback(message) {
+  // Create temporary notification
+  const notification = document.createElement('div');
+  notification.textContent = message;
+  notification.className = 'fixed top-4 right-4 bg-blue-500 text-white px-4 py-2 rounded-lg shadow-lg z-50 text-sm';
+  document.body.appendChild(notification);
+  
+  // Remove after 2 seconds
+  setTimeout(() => {
+    if (document.body.contains(notification)) {
+      document.body.removeChild(notification);
+    }
+  }, 2000);
+}
+
+// Show booking completion section
+window.showBookingCompletion = function(therapist, dateStr, hour, duration) {
+  // Hide specific booking sections only
+  const sectionsToHide = [
+    'booking-therapist-info',
+    'service-notes-section',
+    'quick-appointments-section',
+    'calendar-section',
+    'appointment-summary'
+  ];
+  
+  sectionsToHide.forEach(id => {
+    const section = document.getElementById(id);
+    if (section) {
+      section.style.display = 'none';
+      section.classList.add('hidden');
+    }
+  });
+  
+  // IMPORTANT: Clear the calendar days container to ensure fresh render on next booking
+  const calendarDays = document.getElementById('calendar-days-container');
+  if (calendarDays) {
+    calendarDays.innerHTML = '';
+    console.log('✅ Calendar days cleared for fresh render on next booking');
+  }
+  
+  // Clear time slots container
+  const timeSlotsContainer = document.getElementById('time-slots-container');
+  if (timeSlotsContainer) {
+    timeSlotsContainer.innerHTML = '';
+    timeSlotsContainer.classList.add('hidden');
+    console.log('✅ Time slots cleared for fresh render on next booking');
+  }
+  
+  // Hide service selection section specifically
+  const serviceContainer = document.getElementById('booking-services-container');
+  if (serviceContainer) {
+    // Hide the closest parent div that contains the service selection
+    let parent = serviceContainer.parentElement;
+    while (parent && !parent.classList.contains('bg-white')) {
+      parent = parent.parentElement;
+    }
+    if (parent) {
+      parent.style.display = 'none';
+    }
+  }
+  
+  // Hide the booking step header with "Back to Therapists" button
+  const bookingStepHeader = document.querySelector('#therapist-step-booking .text-center.mb-3');
+  if (bookingStepHeader) {
+    bookingStepHeader.style.display = 'none';
+    console.log('✅ Back to Therapists button hidden');
+  } else {
+    console.log('❌ Could not find Back to Therapists button to hide');
+  }
+  
+  // Get elements
+  const completionSection = document.getElementById('booking-completed-section');
+  const completionDetails = document.getElementById('booking-completion-details');
+  const locationDetails = document.getElementById('service-location-details');
+  
+  if (!completionSection || !completionDetails || !locationDetails) {
+    console.error('❌ Missing completion elements:', {
+      completionSection: !!completionSection,
+      completionDetails: !!completionDetails,
+      locationDetails: !!locationDetails
+    });
+    return;
+  }
+  
+  console.log('✅ All completion elements found');
+  
+  // Booking information
+  const fullName = `Dr. ${therapist.first_name} ${therapist.last_name}`;
+  const selectedService = window.bookingState.selectedService;
+  const serviceName = selectedService ? selectedService.name : 'Therapy Session';
+  const servicePrice = selectedService ? selectedService.price : 'N/A';
+  const serviceKey = selectedService ? selectedService.key : 'in_person_therapy';
+  const date = new Date(dateStr);
+  const durationText = duration === 1 ? '1 hour' : `${duration} hours`;
+  const timeRange = duration === 1 ? 
+    `${hour.toString().padStart(2, '0')}:00 - ${(hour + 1).toString().padStart(2, '0')}:00` :
+    `${hour.toString().padStart(2, '0')}:00 - ${(hour + duration).toString().padStart(2, '0')}:00`;
+  
+  // Minimal booking details with consistent small fonts
+  completionDetails.innerHTML = `
+    <div class="space-y-4">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="space-y-1">
+          <h4 class="text-xs font-medium text-gray-500 mb-1">Therapist</h4>
+          <p class="text-sm font-medium text-gray-900">${fullName}</p>
+          <p class="text-xs text-gray-600">${therapist.title}</p>
+        </div>
+        
+        <div class="space-y-1">
+          <h4 class="text-xs font-medium text-gray-500 mb-1">Service</h4>
+          <p class="text-sm font-medium text-gray-900">${serviceName}</p>
+          <p class="text-xs text-gray-600">${durationText}</p>
+        </div>
+        
+        <div class="space-y-1">
+          <h4 class="text-xs font-medium text-gray-500 mb-1">Date & Time</h4>
+          <p class="text-sm font-medium text-gray-900">${date.toLocaleDateString('en-US', { 
+            weekday: 'long', 
+            year: 'numeric', 
+            month: 'long', 
+            day: 'numeric' 
+          })}</p>
+          <p class="text-xs text-gray-600">${timeRange}</p>
+        </div>
+        
+        <div class="space-y-1">
+          <h4 class="text-xs font-medium text-gray-500 mb-1">Total Cost</h4>
+          <p class="text-sm font-semibold text-gray-900">€${servicePrice}</p>
+        </div>
+      </div>
+    </div>
+  `;
+  
+  // Service-specific location/link details  
+  if (serviceKey === 'online_therapy') {
+    const meetingLink = window.generateMeetingLink();
+    locationDetails.innerHTML = `
+      <div>
+        <h3 class="text-sm font-medium text-gray-900 mb-3">Online Session</h3>
+        
+        <div class="bg-blue-50 rounded-xl p-4 mb-4">
+          <h4 class="text-xs font-medium text-gray-900 mb-2">Meeting Link</h4>
+          <div class="bg-white rounded-lg p-3 border border-gray-200 cursor-pointer hover:bg-gray-50 transition-colors" onclick="copyMeetingLink('${meetingLink}')">
+            <code class="text-blue-600 break-all block" style="font-size: 10px; line-height: 1.4;">${meetingLink}</code>
+            <div class="flex items-center gap-1 mt-2">
+              <svg class="w-3 h-3 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+              </svg>
+              <span class="text-xs text-gray-500">Click to copy</span>
+            </div>
+          </div>
+          <p class="text-xs text-gray-600 mt-2">Click the link above when it's time for your session</p>
+        </div>
+        
+        <div class="space-y-1 text-xs text-gray-600">
+          <p>• Test your camera and microphone beforehand</p>
+          <p>• Ensure stable internet connection</p>
+          <p>• Join 2-3 minutes before appointment time</p>
+        </div>
+      </div>
+    `;
+  } else {
+    // For in-person services
+    const address = therapist.address || 'Address will be provided upon confirmation';
+    const embedMapUrl = therapist.address ? 
+      `https://www.google.com/maps/embed/v1/place?key=AIzaSyCAj9zHtiXAd03iHt9GR-G0VBamXtLVpu0&q=${encodeURIComponent(address)}` : null;
+    
+    locationDetails.innerHTML = `
+      <div>
+        <h3 class="text-sm font-medium text-gray-900 mb-3">Location</h3>
+        
+        <div class="space-y-3">
+          <div>
+            <h4 class="text-xs font-medium text-gray-900 mb-1">Address</h4>
+            <p class="text-xs text-gray-700">${address}</p>
+          </div>
+          
+          ${embedMapUrl ? `
+          <div>
+            <h4 class="text-xs font-medium text-gray-900 mb-1">Map</h4>
+            <div class="rounded-lg overflow-hidden border border-gray-200">
+              <iframe 
+                src="${embedMapUrl}"
+                width="100%" 
+                height="200" 
+                style="border:0;" 
+                allowfullscreen="" 
+                loading="lazy" 
+                referrerpolicy="no-referrer-when-downgrade">
+              </iframe>
+            </div>
+          </div>
+          ` : ''}
+          
+          <div class="pt-3 border-t border-gray-100">
+            <div class="space-y-1 text-xs text-gray-600">
+              <p>• Arrive 5-10 minutes early</p>
+              <p>• Bring valid ID if required</p>
+              <p>• Parking details in confirmation email</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+  
+  // Add the new appointment to the appointments data
+  window.addNewAppointment({
+    therapist: therapist,
+    service: selectedService,
+    date: dateStr,
+    time: hour,
+    duration: duration,
+    isOnline: serviceKey === 'online_therapy'
+  });
+  
+  // Show completion section
+  completionSection.classList.remove('hidden');
+  completionSection.style.display = 'block';
+  
+  console.log('✅ Booking completion section shown');
+  console.log('Completion section:', completionSection);
+  console.log('Details populated:', completionDetails.innerHTML !== '');
+  console.log('Location populated:', locationDetails.innerHTML !== '');
+  
+  // Auto-scroll to completion section
+  setTimeout(() => {
+    completionSection.scrollIntoView({ 
+      behavior: 'smooth', 
+      block: 'start' 
+    });
+  }, 200);
+  
+  // CRITICAL: Reset ALL booking state immediately after successful booking
+  // This ensures the next booking starts with a completely clean state
+  window.bookingState = {
+    currentTherapist: null,
+    selectedDate: null,
+    selectedTime: null,
+    selectedDuration: 1,
+    selectedService: null,
+    currentMonth: new Date().getMonth(),
+    currentYear: new Date().getFullYear()
+  };
+  
+  console.log('🔄 Booking state completely reset after successful booking completion');
+};
+
+// Function to handle "Agree" button click and return to therapist list
+window.agreeAndReturnToTherapists = function() {
+  console.log('🔙 Browse Therapists clicked - completely resetting booking flow');
+  
+  // Hide all booking-related sections
+  const bookingSectionsToHide = [
+    'booking-completed-section',
+    'therapist-step-booking',
+    'therapist-step-2',
+    'therapist-step-3-location',
+    'therapist-step-3-criteria',
+    'therapist-step-3-quiz'
+  ];
+  
+  bookingSectionsToHide.forEach(sectionId => {
+    const section = document.getElementById(sectionId);
+    if (section) {
+      section.classList.add('hidden');
+      section.style.display = 'none';
+    }
+  });
+  
+  // Get previous step BEFORE resetting booking state
+  const previousStep = window.bookingState?.previousStep || 'therapist-step-1';
+  console.log('🔄 Returning user to previous step:', previousStep);
+  
+  // Completely reset booking state (but preserve previousStep briefly)
+  window.bookingState = {
+    currentTherapist: null,
+    selectedDate: null,
+    selectedTime: null,
+    selectedDuration: 1,
+    selectedService: null,
+    currentMonth: new Date().getMonth(),
+    currentYear: new Date().getFullYear(),
+    previousStep: previousStep // Keep this for potential future use
+  };
+  
+  // Return user to their previous step (where they selected the therapist)
+  const stepToShow = document.getElementById(previousStep);
+  if (stepToShow) {
+    stepToShow.classList.remove('hidden');
+    stepToShow.style.display = 'block';
+    stepToShow.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    console.log('✅ Successfully returned to:', previousStep);
+    
+    // If returning to quiz results, check if therapist cards are still there
+    if (previousStep === 'therapist-step-3-quiz') {
+      setTimeout(() => {
+        const quizContainer = document.getElementById('quiz-question-container');
+        if (quizContainer && (!quizContainer.innerHTML || quizContainer.innerHTML.trim() === '')) {
+          console.warn('⚠️ Quiz results missing, redirecting to step 2');
+          stepToShow.classList.add('hidden');
+          stepToShow.style.display = 'none';
+          const step2 = document.getElementById('therapist-step-2');
+          if (step2) {
+            step2.classList.remove('hidden');
+            step2.style.display = 'block';
+            step2.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }
+        }
+      }, 100);
+    }
+  } else {
+    // Fallback to step 2 (better than step 1 since step 2 has navigation to actual therapist selection)
+    console.warn('⚠️ Previous step not found, falling back to step 2');
+    const step2 = document.getElementById('therapist-step-2');
+    if (step2) {
+      step2.classList.remove('hidden');
+      step2.style.display = 'block';
+      step2.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    } else {
+      // Last resort fallback to step 1
+      const step1 = document.getElementById('therapist-step-1');
+      if (step1) {
+        step1.classList.remove('hidden');
+        step1.style.display = 'block';
+        step1.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }
+  }
+  
+  // COMPLETELY CLEAR ALL BOOKING-RELATED UI ELEMENTS
+  console.log('🧹 Clearing all booking UI elements...');
+  
+  // CRITICAL: Clear all booking step containers to ensure fresh start
+  const bookingContainersToClear = [
+    'booking-therapist-info',
+    'quick-appointments-container',
+    'calendar-days-container',
+    'service-notes-content',
+    'appointment-summary',
+    'time-slots-container'
+  ];
+  
+  // Note: Removed 'booking-services-container' from the list above
+  // We'll handle it separately to avoid hiding it permanently
+  
+  bookingContainersToClear.forEach(containerId => {
+    const container = document.getElementById(containerId);
+    if (container) {
+      container.innerHTML = '';
+      container.classList.add('hidden');
+      console.log(`✅ Cleared and hid container: ${containerId}`);
+    }
+  });
+  
+  // Clear booking-services-container but don't hide it
+  const servicesContainer = document.getElementById('booking-services-container');
+  if (servicesContainer) {
+    servicesContainer.innerHTML = '';
+    console.log('✅ Cleared booking-services-container (not hidden)');
+  }
+  
+  // Clear all time slot period containers
+  const timePeriods = ['morning-slots', 'noon-slots', 'afternoon-slots', 'evening-slots', 'night-slots'];
+  timePeriods.forEach(periodId => {
+    const periodContainer = document.getElementById(periodId);
+    if (periodContainer) {
+      periodContainer.classList.add('hidden');
+      const slotsContainer = periodContainer.querySelector(`[data-period]`);
+      if (slotsContainer) slotsContainer.innerHTML = '';
+    }
+  });
+  
+  // Reset service selection completely
+  document.querySelectorAll('.service-option').forEach(option => {
+    option.classList.remove('border-blue-500', 'bg-blue-50', 'ring-2', 'ring-blue-200', 'hidden');
+    option.classList.add('border-gray-200', 'bg-gray-50');
+  });
+  
+  // Remove all change service buttons
+  document.querySelectorAll('.change-service-btn').forEach(btn => btn.remove());
+  
+  // Already cleared containers above - no need to duplicate
+  
+  // Hide booking sections that should be hidden initially
+  const initialSectionsToHide = [
+    'service-notes-section',
+    'quick-appointments-section', 
+    'calendar-section',
+    'appointment-summary',
+    'time-slots-container'
+  ];
+  
+  initialSectionsToHide.forEach(sectionId => {
+    const section = document.getElementById(sectionId);
+    if (section) {
+      section.classList.add('hidden');
+      section.style.display = 'none';
+    }
+  });
+  
+  // Reset calendar display
+  const monthYearElement = document.getElementById('calendar-month-year');
+  const monthYearElementMobile = document.getElementById('calendar-month-year-mobile');
+  if (monthYearElement) monthYearElement.textContent = 'January 2024';
+  if (monthYearElementMobile) monthYearElementMobile.textContent = 'January 2024';
+  
+  console.log('✅ All booking UI elements cleared and reset');
+  
+  // CRITICAL: Reset any global variables that might interfere with fresh booking
+  window.selectedTherapistForBooking = null;
+  window.currentBookingTherapist = null;
+  
+  // Clear any cached booking state that might persist
+  sessionStorage.removeItem('bookingState');
+  sessionStorage.removeItem('selectedTherapist');
+  sessionStorage.removeItem('bookingProgress');
+  
+  // Ensure that the next booking will be treated as completely fresh
+  delete window.bookingInitialized;
+  
+  console.log('🔄 All global booking variables and storage cleared');
+  
+  // Scroll to therapist section
+  const therapistSection = document.getElementById('meet-therapist-section');
+  if (therapistSection) {
+    therapistSection.scrollIntoView({ 
+      behavior: 'smooth', 
+      block: 'start' 
+    });
+  }
+  
+  console.log('✅ Completely reset to therapist list - ready for new booking');
+};
+
+// Function to view appointments after booking
+window.viewMyAppointments = function() {
+  console.log('📅 Navigating to appointments view');
+  
+  // Hide the booking completion section
+  const completionSection = document.getElementById('booking-completed-section');
+  if (completionSection) {
+    completionSection.classList.add('hidden');
+    completionSection.style.display = 'none';
+  }
+  
+  // Hide the booking step
+  const bookingStep = document.getElementById('therapist-step-booking');
+  if (bookingStep) {
+    bookingStep.classList.add('hidden');
+    bookingStep.style.display = 'none';
+  }
+  
+  // Hide all other therapist steps except step 1
+  const steps = ['therapist-step-2', 'therapist-step-3-location', 'therapist-step-3-criteria', 'therapist-step-3-quiz'];
+  steps.forEach(stepId => {
+    const element = document.getElementById(stepId);
+    if (element) {
+      element.style.display = 'none';
+      element.classList.add('hidden');
+    }
+  });
+  
+  // Show step 1 (therapist list) - keep Find therapist container visible
+  const step1 = document.getElementById('therapist-step-1');
+  if (step1) {
+    step1.classList.remove('hidden');
+    step1.style.display = 'block';
+  }
+  
+  // Ensure appointments section is visible and load appointments
+  const appointmentsSection = document.getElementById('appointments-section');
+  if (appointmentsSection) {
+    appointmentsSection.classList.remove('hidden');
+    appointmentsSection.style.display = 'block';
+    
+    // Ensure upcoming tab is active and load appointments
+    if (window.appointmentsSystem) {
+      console.log('🔄 Switching to upcoming tab and refreshing appointments...');
+      window.appointmentsSystem.switchTab('upcoming');
+      
+      // Force refresh after a short delay to ensure everything is loaded
+      setTimeout(() => {
+        if (window.appointmentsSystem.loadUpcomingAppointments) {
+          console.log('🔄 Force refreshing appointments display...');
+          window.appointmentsSystem.loadUpcomingAppointments();
+          console.log('📊 Current appointments count:', window.appointmentsData?.upcomingAppointments?.length || 0);
+        }
+        
+        // Also call our force refresh as backup
+        window.forceRefreshAppointments();
+      }, 100);
+    }
+  }
+  
+  // Reset booking state
+  window.bookingState = {
+    selectedTherapist: null,
+    selectedService: null,
+    selectedDate: null,
+    selectedTime: null,
+    selectedDuration: 1,
+    currentStep: 1
+  };
+  
+  // Scroll to appointments section
+  if (appointmentsSection) {
+    appointmentsSection.scrollIntoView({ 
+      behavior: 'smooth', 
+      block: 'start' 
+    });
+  }
+  
+  console.log('✅ Navigated to appointments view - Find therapist container kept visible');
+};
+
+// Restore booking sections (for development use only)
+window.restoreBookingSections = function() {
+  const sectionsToRestore = [
+    'booking-therapist-info',
+    'service-notes-section', 
+    'quick-appointments-section',
+    'calendar-section',
+    'appointment-summary'
+  ];
+  
+  sectionsToRestore.forEach(id => {
+    const section = document.getElementById(id);
+    if (section) {
+      section.style.display = '';
+      section.classList.remove('hidden');
+    }
+  });
+  
+  // Restore service selection
+  const serviceContainer = document.getElementById('booking-services-container');
+  if (serviceContainer) {
+    let parent = serviceContainer.parentElement;
+    while (parent && !parent.classList.contains('bg-white')) {
+      parent = parent.parentElement;
+    }
+    if (parent) {
+      parent.style.display = '';
+    }
+  }
+  
+  // Restore booking step header
+  const bookingStepHeader = document.querySelector('#therapist-step-booking > div > .text-center');
+  if (bookingStepHeader) {
+    bookingStepHeader.style.display = '';
+  }
+  
+  // Hide completion section
+  const completionSection = document.getElementById('booking-completed-section');
+  if (completionSection) {
+    completionSection.classList.add('hidden');
+    completionSection.style.display = 'none';
+  }
+};
+
+// Add new appointment to appointments data
+window.addNewAppointment = function(appointmentData) {
+  console.log('📅 Adding new appointment to appointments data:', appointmentData);
+  
+  // Check if appointmentsData exists
+  if (!window.appointmentsData) {
+    console.warn('⚠️ appointmentsData not found, creating it...');
+    window.appointmentsData = {
+      upcomingAppointments: [],
+      previousSessions: []
+    };
+  }
+  
+  console.log('📊 Current appointments before adding:', window.appointmentsData.upcomingAppointments.length);
+  
+  const { therapist, service, date, time, duration, isOnline } = appointmentData;
+  
+  // Create the new appointment object
+  const startTime = time.toString().padStart(2, '0') + ':00';
+  const endTime = (time + duration).toString().padStart(2, '0') + ':00';
+  
+  const newAppointment = {
+    id: 'apt_' + Date.now(),
+    therapistId: therapist.id || window.therapistData.indexOf(therapist),
+    therapistName: `Dr. ${therapist.first_name} ${therapist.last_name}`,
+    therapistImage: therapist.image || 'User Panel Media/therapist1.png',
+    service: service.name,
+    date: new Date(date),
+    time: `${startTime} - ${endTime}`,
+    duration: duration,
+    status: 'pending',
+    location: isOnline ? null : (therapist.address || `${therapist.area}, ${therapist.city}`),
+    meetingLink: isOnline ? window.generateMeetingLink() : null,
+    cost: service.price,
+    notes: 'New appointment booking'
+  };
+  
+  // Add to upcoming appointments
+  window.appointmentsData.upcomingAppointments.push(newAppointment);
+  
+  console.log('✅ Added new appointment to appointments data:', newAppointment);
+  console.log('📊 Total appointments after adding:', window.appointmentsData.upcomingAppointments.length);
+  console.log('📋 All appointments:', window.appointmentsData.upcomingAppointments);
+  
+  // Immediately try to add the appointment to the DOM as a fallback
+  const list = document.getElementById('upcoming-appointments-list');
+  const emptyState = document.getElementById('upcoming-empty-state');
+  
+  if (list && emptyState) {
+    console.log('🔧 Direct DOM manipulation as immediate fallback...');
+    
+    // Hide empty state
+    emptyState.classList.add('hidden');
+    
+    // Create and add the appointment card directly
+    const card = document.createElement('div');
+    card.className = 'bg-white border border-gray-100 rounded-xl p-4 sm:p-6 shadow-sm hover:shadow-md transition-all duration-200 hover:-translate-y-1';
+    card.innerHTML = `
+      <div class="flex flex-col sm:flex-row items-start gap-4">
+        <img src="${newAppointment.therapistImage}" alt="${newAppointment.therapistName}" 
+             class="w-16 h-16 rounded-full object-cover border-2 border-blue-100 flex-shrink-0 mx-auto sm:mx-0">
+        <div class="flex-1 text-center sm:text-left">
+          <h3 class="text-lg font-semibold text-gray-900 mb-1">${newAppointment.therapistName}</h3>
+          <p class="text-blue-600 font-medium mb-2">${newAppointment.service}</p>
+          <div class="flex flex-col sm:flex-row sm:items-center gap-2 text-sm text-gray-600 mb-3">
+            <div class="flex items-center gap-1">
+              <span>📅</span>
+              <span>${newAppointment.date.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</span>
+            </div>
+            <div class="flex items-center gap-1">
+              <span>🕐</span>
+              <span>${newAppointment.time}</span>
+            </div>
+            <div class="flex items-center gap-1">
+              <span>⏱️</span>
+              <span>${newAppointment.duration} hour${newAppointment.duration > 1 ? 's' : ''}</span>
+            </div>
+          </div>
+          <div class="flex items-center gap-2 mb-3">
+            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-orange-100 text-orange-800">
+              ${newAppointment.status === 'pending' ? 'Pending Confirmation' : newAppointment.status}
+            </span>
+          </div>
+          ${newAppointment.location ? `
+            <div class="flex items-center gap-1 text-sm text-gray-600 mb-2">
+              <span>📍</span>
+              <span>${newAppointment.location}</span>
+            </div>
+          ` : ''}
+          ${newAppointment.meetingLink ? `
+            <div class="flex items-center gap-1 text-sm text-blue-600 mb-2">
+              <span>💻</span>
+              <span>Online Session</span>
+            </div>
+          ` : ''}
+        </div>
+        <div class="text-center sm:text-right">
+          <div class="text-2xl font-bold text-blue-600 mb-2">€${newAppointment.cost}</div>
+          <div class="flex flex-col sm:flex-row gap-2">
+            <button class="px-3 py-1.5 text-xs font-medium text-blue-600 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors">
+              Reschedule
+            </button>
+            <button class="px-3 py-1.5 text-xs font-medium text-gray-600 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+              Contact
+            </button>
+            ${newAppointment.meetingLink ? 
+              `<button onclick="window.appointmentsSystem.copyMeetingLink('${newAppointment.meetingLink}')" 
+                       class="px-3 py-1.5 text-xs font-medium text-purple-600 bg-purple-50 rounded-lg hover:bg-purple-100 transition-colors">
+                 Copy Link
+               </button>` :
+              `<button onclick="window.appointmentsSystem.copyAddress('${newAppointment.location}')" 
+                       class="px-3 py-1.5 text-xs font-medium text-orange-600 bg-orange-50 rounded-lg hover:bg-orange-100 transition-colors">
+                 Copy Address
+               </button>`
+            }
+          </div>
+        </div>
+      </div>
+    `;
+    
+    // Add to the beginning of the list
+    list.insertBefore(card, list.firstChild);
+    console.log('✅ Added appointment card directly to DOM');
+  }
+  
+  // Refresh appointments display if the appointments system is available
+  if (window.appointmentsSystem && typeof window.appointmentsSystem.loadUpcomingAppointments === 'function') {
+    console.log('🔄 Calling loadUpcomingAppointments...');
+    window.appointmentsSystem.loadUpcomingAppointments();
+    console.log('✅ Refreshed appointments display');
+  } else {
+    console.warn('⚠️ appointmentsSystem not available or loadUpcomingAppointments not a function');
+    console.log('appointmentsSystem exists:', !!window.appointmentsSystem);
+    if (window.appointmentsSystem) {
+      console.log('loadUpcomingAppointments type:', typeof window.appointmentsSystem.loadUpcomingAppointments);
+    }
+    
+    // Try to refresh manually after a short delay
+    setTimeout(() => {
+      if (window.appointmentsSystem && typeof window.appointmentsSystem.loadUpcomingAppointments === 'function') {
+        console.log('🔄 Delayed refresh attempt...');
+        window.appointmentsSystem.loadUpcomingAppointments();
+        console.log('✅ Delayed refresh completed');
+      } else {
+        console.log('🔧 Using force refresh as fallback...');
+        window.forceRefreshAppointments();
+      }
+    }, 500);
+  }
+};
+
+// Debug function to check appointments data
+window.debugAppointments = function() {
+  console.log('🔍 APPOINTMENTS DEBUG:');
+  console.log('appointmentsData exists:', !!window.appointmentsData);
+  if (window.appointmentsData) {
+    console.log('upcomingAppointments count:', window.appointmentsData.upcomingAppointments?.length || 0);
+    console.log('upcomingAppointments:', window.appointmentsData.upcomingAppointments);
+  }
+  console.log('appointmentsSystem exists:', !!window.appointmentsSystem);
+  if (window.appointmentsSystem) {
+    console.log('loadUpcomingAppointments function exists:', typeof window.appointmentsSystem.loadUpcomingAppointments);
+  }
+  
+  // Check DOM elements
+  const list = document.getElementById('upcoming-appointments-list');
+  const emptyState = document.getElementById('upcoming-empty-state');
+  console.log('upcoming-appointments-list element exists:', !!list);
+  console.log('upcoming-empty-state element exists:', !!emptyState);
+  
+  if (list) {
+    console.log('appointments list children count:', list.children.length);
+  }
+  if (emptyState) {
+    console.log('empty state is hidden:', emptyState.classList.contains('hidden'));
+  }
+};
+
+// Test function to manually add an appointment
+window.testAddAppointment = function() {
+  console.log('🧪 Testing appointment creation...');
+  
+  // Create a test appointment
+  const testAppointment = {
+    therapist: {
+      first_name: 'Test',
+      last_name: 'Therapist',
+      image: 'User Panel Media/therapist1.png',
+      address: 'Test Address',
+      area: 'Test Area',
+      city: 'Test City'
+    },
+    service: {
+      name: 'Test Therapy',
+      price: 75
+    },
+    date: '2025-07-30',
+    time: 14,
+    duration: 1,
+    isOnline: false
+  };
+  
+  window.addNewAppointment(testAppointment);
+  
+  // Wait a bit then debug
+  setTimeout(() => {
+    window.debugAppointments();
+  }, 1000);
+};
+
+// Force refresh appointments display
+window.forceRefreshAppointments = function() {
+  console.log('🔄 Force refreshing appointments...');
+  
+  if (window.appointmentsSystem && window.appointmentsSystem.loadUpcomingAppointments) {
+    window.appointmentsSystem.loadUpcomingAppointments();
+    console.log('✅ Forced refresh completed');
+  } else {
+    console.error('❌ appointmentsSystem or loadUpcomingAppointments not available');
+  }
+  
+  // Also try to manually populate if the system isn't working
+  const list = document.getElementById('upcoming-appointments-list');
+  const emptyState = document.getElementById('upcoming-empty-state');
+  
+  if (list && window.appointmentsData && window.appointmentsData.upcomingAppointments) {
+    console.log('🔧 Manual population attempt...');
+    const appointments = window.appointmentsData.upcomingAppointments;
+    console.log('📊 Appointments to display:', appointments.length);
+    
+    if (appointments.length > 0) {
+      if (emptyState) emptyState.classList.add('hidden');
+      
+      list.innerHTML = '';
+      appointments.forEach((appointment, index) => {
+        console.log(`📋 Creating card for appointment ${index + 1}:`, appointment);
+        
+        // Create a simple appointment card
+        const card = document.createElement('div');
+        card.className = 'bg-white border border-gray-100 rounded-xl p-4 shadow-sm';
+        card.innerHTML = `
+          <div class="flex items-center gap-4">
+            <img src="${appointment.therapistImage}" alt="${appointment.therapistName}" 
+                 class="w-12 h-12 rounded-full object-cover border-2 border-blue-100">
+            <div class="flex-1">
+              <h3 class="font-semibold text-gray-900">${appointment.therapistName}</h3>
+              <p class="text-sm text-gray-600">${appointment.service}</p>
+              <p class="text-sm text-blue-600">${appointment.date.toLocaleDateString()} • ${appointment.time}</p>
+              <p class="text-sm text-orange-600">Status: ${appointment.status}</p>
+            </div>
+            <div class="text-right">
+              <p class="font-semibold text-gray-900">€${appointment.cost}</p>
+            </div>
+          </div>
+        `;
+        list.appendChild(card);
+      });
+      console.log('✅ Manual population completed');
+    } else {
+      if (emptyState) emptyState.classList.remove('hidden');
+      console.log('📭 No appointments to display');
+    }
+  }
+};
+
+console.log('📅 Therapist booking interface loaded'); 

@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>localStorage Debug - Therapist Data</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 p-8">
+    <div class="max-w-4xl mx-auto">
+        <h1 class="text-3xl font-bold mb-6">Therapist Data Debug Console</h1>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- localStorage Debug -->
+            <div class="bg-white rounded-lg p-6 shadow-lg">
+                <h2 class="text-xl font-semibold mb-4">localStorage Debug</h2>
+                <button onclick="checkLocalStorage()" class="bg-blue-500 text-white px-4 py-2 rounded mb-4">Check localStorage</button>
+                <button onclick="clearLocalStorage()" class="bg-red-500 text-white px-4 py-2 rounded mb-4 ml-2">Clear localStorage</button>
+                <div id="localStorage-result" class="bg-gray-50 p-4 rounded text-sm overflow-auto max-h-60"></div>
+            </div>
+            
+            <!-- Window Data Debug -->
+            <div class="bg-white rounded-lg p-6 shadow-lg">
+                <h2 class="text-xl font-semibold mb-4">Window Data Debug</h2>
+                <button onclick="checkWindowData()" class="bg-green-500 text-white px-4 py-2 rounded mb-4">Check window.therapistData</button>
+                <button onclick="loadTherapistDataJS()" class="bg-purple-500 text-white px-4 py-2 rounded mb-4 ml-2">Load therapist-data.js</button>
+                <div id="window-result" class="bg-gray-50 p-4 rounded text-sm overflow-auto max-h-60"></div>
+            </div>
+            
+            <!-- Integration Test -->
+            <div class="bg-white rounded-lg p-6 shadow-lg md:col-span-2">
+                <h2 class="text-xl font-semibold mb-4">Integration Test</h2>
+                <button onclick="testIntegration()" class="bg-orange-500 text-white px-4 py-2 rounded mb-4">Test Full Integration</button>
+                <button onclick="simulateRegistration()" class="bg-indigo-500 text-white px-4 py-2 rounded mb-4 ml-2">Simulate Registration</button>
+                <div id="integration-result" class="bg-gray-50 p-4 rounded text-sm overflow-auto max-h-40"></div>
+            </div>
+            
+            <!-- Live Console -->
+            <div class="bg-white rounded-lg p-6 shadow-lg md:col-span-2">
+                <h2 class="text-xl font-semibold mb-4">Live Console Output</h2>
+                <button onclick="clearConsole()" class="bg-gray-500 text-white px-4 py-2 rounded mb-4">Clear Console</button>
+                <div id="console-output" class="bg-black text-green-400 p-4 rounded text-sm font-mono h-60 overflow-auto"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Load therapist-data.js -->
+    <script src="therapist-data.js"></script>
+    
+    <script>
+        // Console capture
+        const originalLog = console.log;
+        const originalError = console.error;
+        const originalWarn = console.warn;
+        
+        function addToConsole(type, message) {
+            const consoleDiv = document.getElementById('console-output');
+            const timestamp = new Date().toLocaleTimeString();
+            const typeColor = type === 'error' ? 'text-red-400' : type === 'warn' ? 'text-yellow-400' : 'text-green-400';
+            consoleDiv.innerHTML += `<div class="${typeColor}">[${timestamp}] ${type.toUpperCase()}: ${message}</div>`;
+            consoleDiv.scrollTop = consoleDiv.scrollHeight;
+        }
+        
+        console.log = function(...args) {
+            originalLog.apply(console, args);
+            addToConsole('log', args.join(' '));
+        };
+        
+        console.error = function(...args) {
+            originalError.apply(console, args);
+            addToConsole('error', args.join(' '));
+        };
+        
+        console.warn = function(...args) {
+            originalWarn.apply(console, args);
+            addToConsole('warn', args.join(' '));
+        };
+        
+        function clearConsole() {
+            document.getElementById('console-output').innerHTML = '';
+        }
+        
+        function checkLocalStorage() {
+            const result = document.getElementById('localStorage-result');
+            let output = '<h3 class="font-semibold mb-2">localStorage Contents:</h3>';
+            
+            const therapistData = localStorage.getItem('therapistData');
+            const therapistCoordinates = localStorage.getItem('therapistCoordinates');
+            
+            if (therapistData) {
+                try {
+                    const data = JSON.parse(therapistData);
+                    output += `<p><strong>therapistData:</strong> ${data.length} therapists found</p>`;
+                    output += '<ul class="ml-4 mt-2">';
+                    data.forEach((t, i) => {
+                        output += `<li>${i + 1}. Dr. ${t.first_name} ${t.last_name} (ID: ${t.id}) - ${t.area}, ${t.city}</li>`;
+                    });
+                    output += '</ul>';
+                } catch (e) {
+                    output += `<p class="text-red-500"><strong>therapistData:</strong> Error parsing - ${e.message}</p>`;
+                }
+            } else {
+                output += '<p class="text-yellow-500"><strong>therapistData:</strong> Not found in localStorage</p>';
+            }
+            
+            if (therapistCoordinates) {
+                try {
+                    const coords = JSON.parse(therapistCoordinates);
+                    output += `<p class="mt-2"><strong>therapistCoordinates:</strong> ${Object.keys(coords).length} coordinate sets</p>`;
+                } catch (e) {
+                    output += `<p class="text-red-500 mt-2"><strong>therapistCoordinates:</strong> Error parsing - ${e.message}</p>`;
+                }
+            } else {
+                output += '<p class="text-yellow-500 mt-2"><strong>therapistCoordinates:</strong> Not found in localStorage</p>';
+            }
+            
+            result.innerHTML = output;
+        }
+        
+        function clearLocalStorage() {
+            localStorage.removeItem('therapistData');
+            localStorage.removeItem('therapistCoordinates');
+            console.log('localStorage cleared');
+            checkLocalStorage();
+        }
+        
+        function checkWindowData() {
+            const result = document.getElementById('window-result');
+            let output = '<h3 class="font-semibold mb-2">Window Data:</h3>';
+            
+            if (window.therapistData) {
+                output += `<p><strong>window.therapistData:</strong> ${window.therapistData.length} therapists</p>`;
+                output += '<ul class="ml-4 mt-2">';
+                window.therapistData.slice(-5).forEach((t, i) => {
+                    output += `<li>Last ${i + 1}: Dr. ${t.first_name} ${t.last_name} (ID: ${t.id}) - ${t.area}, ${t.city}</li>`;
+                });
+                output += '</ul>';
+            } else {
+                output += '<p class="text-red-500"><strong>window.therapistData:</strong> Not found</p>';
+            }
+            
+            output += '<br><h4 class="font-semibold mt-2">Available Functions:</h4>';
+            const functions = [
+                'loadAndMergeLocalStorageTherapists',
+                'refreshTherapistData',
+                'simplePopulate',
+                'populateTherapistCards',
+                'testLocalStorageIntegration'
+            ];
+            
+            functions.forEach(func => {
+                const exists = typeof window[func] === 'function';
+                const color = exists ? 'text-green-600' : 'text-red-600';
+                output += `<p class="${color}">• ${func}: ${exists ? 'Available' : 'Missing'}</p>`;
+            });
+            
+            result.innerHTML = output;
+        }
+        
+        function loadTherapistDataJS() {
+            console.log('Loading therapist-data.js functions...');
+            
+            // Try to trigger localStorage loading
+            if (window.loadAndMergeLocalStorageTherapists) {
+                console.log('Triggering localStorage integration...');
+                const added = window.loadAndMergeLocalStorageTherapists();
+                console.log(`Added ${added.length} therapists from localStorage`);
+            } else {
+                console.error('loadAndMergeLocalStorageTherapists function not available');
+            }
+            
+            setTimeout(() => checkWindowData(), 100);
+        }
+        
+        function testIntegration() {
+            const result = document.getElementById('integration-result');
+            let output = '<h3 class="font-semibold mb-2">Integration Test Results:</h3>';
+            
+            console.log('Starting integration test...');
+            
+            // Step 1: Check localStorage
+            const savedData = localStorage.getItem('therapistData');
+            if (savedData) {
+                const localTherapists = JSON.parse(savedData);
+                output += `<p>✅ Step 1: localStorage has ${localTherapists.length} therapists</p>`;
+                console.log(`localStorage contains ${localTherapists.length} therapists`);
+            } else {
+                output += '<p>❌ Step 1: No data in localStorage</p>';
+                console.error('No therapist data in localStorage');
+            }
+            
+            // Step 2: Check window data
+            if (window.therapistData) {
+                output += `<p>✅ Step 2: window.therapistData has ${window.therapistData.length} therapists</p>`;
+                console.log(`window.therapistData contains ${window.therapistData.length} therapists`);
+            } else {
+                output += '<p>❌ Step 2: window.therapistData not available</p>';
+                console.error('window.therapistData not available');
+            }
+            
+            // Step 3: Test integration function
+            if (window.loadAndMergeLocalStorageTherapists) {
+                console.log('Testing localStorage integration function...');
+                const originalCount = window.therapistData ? window.therapistData.length : 0;
+                const added = window.loadAndMergeLocalStorageTherapists();
+                const newCount = window.therapistData ? window.therapistData.length : 0;
+                
+                output += `<p>✅ Step 3: Integration function available</p>`;
+                output += `<p>   Original: ${originalCount}, Added: ${added.length}, New Total: ${newCount}</p>`;
+                console.log(`Integration test: ${originalCount} → ${newCount} (added ${added.length})`);
+            } else {
+                output += '<p>❌ Step 3: Integration function not available</p>';
+                console.error('loadAndMergeLocalStorageTherapists function not available');
+            }
+            
+            // Step 4: Test populate function
+            if (window.simplePopulate) {
+                output += '<p>✅ Step 4: simplePopulate function available</p>';
+                console.log('simplePopulate function is available');
+            } else {
+                output += '<p>❌ Step 4: simplePopulate function not available</p>';
+                console.error('simplePopulate function not available');
+            }
+            
+            result.innerHTML = output;
+        }
+        
+        function simulateRegistration() {
+            console.log('Simulating therapist registration...');
+            
+            // Create a test therapist
+            const testTherapist = {
+                id: 999,
+                first_name: "Test",
+                last_name: "Therapist",
+                gender: "female",
+                title: "Psychologist",
+                photo: "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHZpZXdCb3g9IjAgMCA2NCA2NCIgZmlsbD0ibm9uZSI+CjxjaXJjbGUgY3g9IjMyIiBjeT0iMzIiIHI9IjMyIiBmaWxsPSIjRjNGNEY2Ii8+Cjx0ZXh0IHg9IjMyIiB5PSI0MCIgZm9udC1mYW1pbHk9InNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMzIiIGZpbGw9IiM2QjczODAiIHRleHQtYW5jaG9yPSJtaWRkbGUiPjx0c3Bhbj7wn6eHPC90c3Bhbj48L3RleHQ+Cjwvc3ZnPg==",
+                address: "123 Test Street, Test Area, Athens 10000",
+                city: "Athens",
+                cityKey: "athens",
+                area: "Test Area",
+                areaKey: "test_area",
+                therapy_approaches: ["Cognitive Behavioral Therapy (CBT)"],
+                therapy_approaches_keys: ["cbt"],
+                languages: ["Greek", "English"],
+                languageKeys: ["greek", "english"],
+                cost: 80,
+                currency: "EUR",
+                services: {
+                    in_person_therapy: {
+                        available: true,
+                        price: 80,
+                        description: "Face-to-face therapy at our office",
+                        duration: 1
+                    }
+                },
+                experience: "5 years in testing environments",
+                education: "Test University",
+                about: "This is a test therapist for debugging purposes",
+                rating: 4.5,
+                availability: "Morning",
+                availabilityKey: "morning",
+                distance: 0,
+                coordinates: { lat: 37.9838, lng: 23.7275 }
+            };
+            
+            // Get existing data or create new array
+            const existingData = localStorage.getItem('therapistData');
+            let therapistArray = [];
+            
+            if (existingData) {
+                try {
+                    therapistArray = JSON.parse(existingData);
+                } catch (e) {
+                    console.error('Error parsing existing data:', e);
+                }
+            }
+            
+            // Remove any existing test therapist
+            therapistArray = therapistArray.filter(t => t.id !== 999);
+            
+            // Add new test therapist
+            therapistArray.push(testTherapist);
+            
+            // Save to localStorage
+            localStorage.setItem('therapistData', JSON.stringify(therapistArray));
+            
+            // Also save coordinates
+            const existingCoords = localStorage.getItem('therapistCoordinates');
+            let coordsObject = {};
+            
+            if (existingCoords) {
+                try {
+                    coordsObject = JSON.parse(existingCoords);
+                } catch (e) {
+                    console.error('Error parsing existing coordinates:', e);
+                }
+            }
+            
+            coordsObject[999] = testTherapist.coordinates;
+            localStorage.setItem('therapistCoordinates', JSON.stringify(coordsObject));
+            
+            console.log('✅ Test therapist added to localStorage');
+            
+            // Now test the integration
+            setTimeout(() => {
+                testIntegration();
+                checkLocalStorage();
+            }, 100);
+        }
+        
+        // Auto-run on page load
+        setTimeout(() => {
+            console.log('Debug page loaded');
+            checkLocalStorage();
+            checkWindowData();
+        }, 1000);
+    </script>
+</body>
+</html> 

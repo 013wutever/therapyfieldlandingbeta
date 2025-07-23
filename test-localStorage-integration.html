@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test localStorage Integration - Therapy Field</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="therapist-data.js"></script>
+    <script src="localStorage-integration-fix.js"></script>
+</head>
+<body class="bg-gray-50 min-h-screen p-8">
+    <div class="max-w-6xl mx-auto">
+        <h1 class="text-3xl font-bold mb-8 text-center">localStorage Integration Test</h1>
+        
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <!-- Current Status Panel -->
+            <div class="bg-white rounded-lg p-6 shadow">
+                <h2 class="text-xl font-semibold mb-4">Current Status</h2>
+                <div class="space-y-2">
+                    <button onclick="checkStatus()" class="w-full bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600">
+                        Check Status
+                    </button>
+                    <div id="statusDisplay" class="text-sm bg-gray-100 p-3 rounded min-h-20"></div>
+                </div>
+            </div>
+            
+            <!-- Test Actions Panel -->
+            <div class="bg-white rounded-lg p-6 shadow">
+                <h2 class="text-xl font-semibold mb-4">Test Actions</h2>
+                <div class="space-y-2">
+                    <button onclick="addTestTherapist()" class="w-full bg-green-500 text-white py-2 px-4 rounded hover:bg-green-600 text-sm">
+                        Add Test Therapist
+                    </button>
+                    <button onclick="testForceLoad()" class="w-full bg-purple-500 text-white py-2 px-4 rounded hover:bg-purple-600 text-sm">
+                        Test Force Load
+                    </button>
+                    <button onclick="testLocationPopulation()" class="w-full bg-indigo-500 text-white py-2 px-4 rounded hover:bg-indigo-600 text-sm">
+                        Test Location Population
+                    </button>
+                    <button onclick="testCriteriaPopulation()" class="w-full bg-pink-500 text-white py-2 px-4 rounded hover:bg-pink-600 text-sm">
+                        Test Criteria Population
+                    </button>
+                    <button onclick="clearAll()" class="w-full bg-red-500 text-white py-2 px-4 rounded hover:bg-red-600 text-sm">
+                        Clear All Data
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Quick Info Panel -->
+            <div class="bg-white rounded-lg p-6 shadow">
+                <h2 class="text-xl font-semibold mb-4">Quick Info</h2>
+                <div id="quickInfo" class="text-sm space-y-2">
+                    <div>🔧 Integration Fix: <span id="fixStatus" class="font-semibold">Checking...</span></div>
+                    <div>📊 Total Therapists: <span id="totalCount" class="font-semibold">0</span></div>
+                    <div>🆕 Registered: <span id="registeredCount" class="font-semibold">0</span></div>
+                    <div>📱 localStorage: <span id="storageStatus" class="font-semibold">Empty</span></div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Log Panel -->
+        <div class="bg-white rounded-lg p-6 shadow mb-6">
+            <h2 class="text-xl font-semibold mb-4">Test Log</h2>
+            <div id="testLog" class="text-sm bg-gray-900 text-green-400 p-4 rounded max-h-60 overflow-y-auto font-mono"></div>
+            <button onclick="clearLog()" class="mt-2 bg-gray-500 text-white py-1 px-3 rounded hover:bg-gray-600">
+                Clear Log
+            </button>
+        </div>
+        
+        <!-- Live Test Containers -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <!-- Location Step Test -->
+            <div class="bg-white rounded-lg p-6 shadow">
+                <h2 class="text-xl font-semibold mb-4">Location Step Test</h2>
+                <div id="therapist-cards-container" class="min-h-40 border-2 border-dashed border-gray-300 rounded p-4">
+                    <div class="text-center text-gray-500">Location cards will appear here</div>
+                </div>
+                <button onclick="testLocationPopulation()" class="mt-4 w-full bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600">
+                    Populate Location Cards
+                </button>
+            </div>
+            
+            <!-- Criteria Step Test -->
+            <div class="bg-white rounded-lg p-6 shadow">
+                <h2 class="text-xl font-semibold mb-4">Criteria Step Test</h2>
+                <div id="criteria-therapist-cards-container" class="min-h-40 border-2 border-dashed border-gray-300 rounded p-4">
+                    <div class="text-center text-gray-500">Criteria cards will appear here</div>
+                </div>
+                <button onclick="testCriteriaPopulation()" class="mt-4 w-full bg-purple-500 text-white py-2 px-4 rounded hover:bg-purple-600">
+                    Populate Criteria Cards
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Debug logging function
+        function log(message, color = 'text-green-400') {
+            const logElement = document.getElementById('testLog');
+            const timestamp = new Date().toLocaleTimeString();
+            logElement.innerHTML += `<div class="${color}">[${timestamp}] ${message}</div>`;
+            logElement.scrollTop = logElement.scrollHeight;
+            console.log(message);
+        }
+        
+        function clearLog() {
+            document.getElementById('testLog').innerHTML = '';
+        }
+        
+        // Check current status
+        function checkStatus() {
+            log('🔍 Checking current status...');
+            
+            // Check localStorage
+            const therapistData = localStorage.getItem('therapistData');
+            const coordinates = localStorage.getItem('therapistCoordinates');
+            
+            // Check window data
+            const windowData = window.therapistData;
+            const fixLoaded = typeof window.forceLoadRegisteredTherapists === 'function';
+            
+            // Update quick info
+            const registeredCount = therapistData ? JSON.parse(therapistData).length : 0;
+            const totalCount = windowData ? windowData.length : 0;
+            
+            document.getElementById('fixStatus').textContent = fixLoaded ? 'Loaded ✅' : 'Missing ❌';
+            document.getElementById('fixStatus').className = fixLoaded ? 'font-semibold text-green-600' : 'font-semibold text-red-600';
+            document.getElementById('totalCount').textContent = totalCount;
+            document.getElementById('registeredCount').textContent = registeredCount;
+            document.getElementById('storageStatus').textContent = therapistData ? `${registeredCount} items` : 'Empty';
+            document.getElementById('storageStatus').className = therapistData ? 'font-semibold text-green-600' : 'font-semibold text-red-600';
+            
+            // Detailed status
+            const statusHtml = `
+                <div class="space-y-1">
+                    <div><strong>Integration Fix:</strong> ${fixLoaded ? '✅ Loaded' : '❌ Missing'}</div>
+                    <div><strong>localStorage:</strong> ${therapistData ? `✅ ${registeredCount} therapists` : '❌ Empty'}</div>
+                    <div><strong>Coordinates:</strong> ${coordinates ? '✅ Available' : '❌ Missing'}</div>
+                    <div><strong>window.therapistData:</strong> ${windowData ? `✅ ${totalCount} total` : '❌ Not found'}</div>
+                    <div><strong>Force functions:</strong> ${typeof window.forcePopulateLocationStep === 'function' ? '✅' : '❌'} Available</div>
+                </div>
+            `;
+            document.getElementById('statusDisplay').innerHTML = statusHtml;
+            
+            log(`📊 Status check complete - ${registeredCount} registered, ${totalCount} total`);
+        }
+        
+        // Add test therapist
+        function addTestTherapist() {
+            log('➕ Adding test therapist to localStorage...');
+            
+            const testTherapist = {
+                id: Date.now(), // Unique ID
+                first_name: "Test",
+                last_name: "Therapist",
+                title: "Clinical Psychologist",
+                area: "Test Area",
+                city: "Athens",
+                services: {
+                    in_person_therapy: { available: true, price: 75 },
+                    online_therapy: { available: true, price: 70 }
+                },
+                therapy_approaches: ["CBT", "Test Therapy"],
+                therapy_approaches_keys: ["cbt", "test-therapy"],
+                languages: ["English", "Greek"],
+                languageKeys: ["english", "greek"],
+                cityKey: "athens",
+                gender: "female",
+                education: "PhD in Psychology",
+                experience: "5 years",
+                cost: 75,
+                currency: "EUR",
+                image: "User Panel Media/therapist1.png",
+                distance: 2.5,
+                rating: 4.8
+            };
+            
+            // Get existing registered therapists
+            let registeredTherapists = [];
+            const savedData = localStorage.getItem('therapistData');
+            if (savedData) {
+                registeredTherapists = JSON.parse(savedData);
+            }
+            
+            // Add new therapist
+            registeredTherapists.push(testTherapist);
+            localStorage.setItem('therapistData', JSON.stringify(registeredTherapists));
+            
+            // Add coordinates
+            const coordinates = { [testTherapist.id]: { lat: 37.9755, lng: 23.7348 } };
+            localStorage.setItem('therapistCoordinates', JSON.stringify(coordinates));
+            
+            log(`✅ Test therapist added with ID ${testTherapist.id}`, 'text-blue-400');
+            checkStatus();
+        }
+        
+        // Test force load function
+        function testForceLoad() {
+            log('🔄 Testing force load function...');
+            
+            if (typeof window.forceLoadRegisteredTherapists === 'function') {
+                const result = window.forceLoadRegisteredTherapists();
+                log(`✅ Force load complete - loaded ${result.length} therapists`, 'text-green-400');
+                checkStatus();
+            } else {
+                log('❌ Force load function not available', 'text-red-400');
+            }
+        }
+        
+        // Test location population
+        function testLocationPopulation() {
+            log('🗺️ Testing location population...');
+            
+            if (typeof window.forcePopulateLocationStep === 'function') {
+                window.forcePopulateLocationStep();
+                log('✅ Location population complete', 'text-green-400');
+                
+                // Check if cards were actually created
+                const container = document.getElementById('therapist-cards-container');
+                const cardCount = container.children.length;
+                log(`📊 Location container now has ${cardCount} cards`, 'text-blue-400');
+            } else {
+                log('❌ Location population function not available', 'text-red-400');
+            }
+        }
+        
+        // Test criteria population
+        function testCriteriaPopulation() {
+            log('🎯 Testing criteria population...');
+            
+            if (typeof window.forcePopulateCriteriaStep === 'function') {
+                window.forcePopulateCriteriaStep();
+                log('✅ Criteria population complete', 'text-green-400');
+                
+                // Check if cards were actually created
+                const container = document.getElementById('criteria-therapist-cards-container');
+                const cardCount = container.children.length;
+                log(`📊 Criteria container now has ${cardCount} cards`, 'text-blue-400');
+            } else {
+                log('❌ Criteria population function not available', 'text-red-400');
+            }
+        }
+        
+        // Clear all data
+        function clearAll() {
+            log('🗑️ Clearing all data...');
+            localStorage.removeItem('therapistData');
+            localStorage.removeItem('therapistCoordinates');
+            
+            // Clear containers
+            document.getElementById('therapist-cards-container').innerHTML = '<div class="text-center text-gray-500">Location cards will appear here</div>';
+            document.getElementById('criteria-therapist-cards-container').innerHTML = '<div class="text-center text-gray-500">Criteria cards will appear here</div>';
+            
+            log('✅ All data cleared', 'text-yellow-400');
+            checkStatus();
+        }
+        
+        // Initialize
+        window.addEventListener('load', function() {
+            log('🚀 Test page loaded');
+            setTimeout(() => {
+                checkStatus();
+                log('💡 Ready for testing!', 'text-cyan-400');
+            }, 1000);
+        });
+    </script>
+</body>
+</html> 

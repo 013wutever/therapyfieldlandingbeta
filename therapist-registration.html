@@ -1,0 +1,1249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Therapist Registration - Therapy Field</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAgD6VoceOC-vy4GJW82f0ZaHsv1-EwSyM&libraries=places"></script>
+    <!-- Load therapist-data.js for integration functions -->
+    <script src="therapist-data.js"></script>
+    <style>
+        .service-card {
+            transition: all 0.3s ease;
+        }
+        .service-card.selected {
+            transform: scale(1.02);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+        }
+        .availability-slot {
+            transition: all 0.2s ease;
+        }
+        .availability-slot.selected {
+            background: linear-gradient(135deg, #3B82F6, #1D4ED8);
+            color: white;
+        }
+        .photo-upload-area {
+            transition: all 0.3s ease;
+        }
+        .photo-upload-area:hover {
+            background-color: #F3F4F6;
+        }
+        .form-section {
+            background: white;
+            border-radius: 16px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            border: 1px solid #E5E7EB;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <div class="container mx-auto px-4 py-8 max-w-4xl">
+        <!-- Header -->
+        <div class="text-center mb-8">
+            <h1 class="text-4xl font-bold text-gray-900 mb-4">Join Therapy Field</h1>
+            <p class="text-xl text-gray-600">Register as a therapist and help people on their mental health journey</p>
+        </div>
+
+        <form id="therapistRegistrationForm" class="space-y-6">
+            <!-- Personal Information -->
+            <div class="form-section">
+                <h2 class="text-2xl font-bold text-gray-900 mb-6 flex items-center">
+                    <span class="bg-blue-600 text-white rounded-full w-8 h-8 flex items-center justify-center text-sm mr-3">1</span>
+                    Personal Information
+                </h2>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">First Name *</label>
+                        <input type="text" id="firstName" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Enter your first name">
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Last Name *</label>
+                        <input type="text" id="lastName" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Enter your last name">
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Professional Title *</label>
+                        <select id="title" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <option value="">Select your title</option>
+                            <option value="Psychologist">Psychologist</option>
+                            <option value="Child Psychologist">Child Psychologist</option>
+                            <option value="Psychiatrist">Psychiatrist</option>
+                            <option value="Child Psychiatrist">Child Psychiatrist</option>
+                        </select>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Gender</label>
+                        <select id="gender" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <option value="">Select gender</option>
+                            <option value="male">Male</option>
+                            <option value="female">Female</option>
+                            <option value="non-binary">Non-binary</option>
+                            <option value="prefer-not-to-say">Prefer not to say</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Photo Upload -->
+                <div class="mt-6">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Professional Photo *</label>
+                    <div class="photo-upload-area border-2 border-dashed border-gray-300 rounded-lg p-6 text-center cursor-pointer" onclick="document.getElementById('photoInput').click()">
+                        <div id="photoPreview" class="hidden">
+                            <img id="previewImage" src="" alt="Preview" class="w-32 h-32 rounded-full object-cover mx-auto mb-4">
+                            <p class="text-sm text-gray-600">Click to change photo</p>
+                        </div>
+                        <div id="photoPlaceholder">
+                            <div class="w-16 h-16 bg-gray-200 rounded-full mx-auto mb-4 flex items-center justify-center">
+                                <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                                </svg>
+                            </div>
+                            <p class="text-lg font-medium text-gray-700 mb-1">Upload your photo</p>
+                            <p class="text-sm text-gray-500">JPG, PNG up to 5MB</p>
+                        </div>
+                        <input type="file" id="photoInput" accept="image/*" class="hidden" onchange="handlePhotoUpload(this)">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Office Location -->
+            <div class="form-section">
+                <h2 class="text-2xl font-bold text-gray-900 mb-6 flex items-center">
+                    <span class="bg-blue-600 text-white rounded-full w-8 h-8 flex items-center justify-center text-sm mr-3">2</span>
+                    Office Location
+                </h2>
+                
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Office Address *</label>
+                        <input type="text" id="officeAddress" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Enter your office address">
+                        <p class="text-sm text-gray-500 mt-1">Click on the map below to set precise location</p>
+                    </div>
+                    
+                    <div id="map" class="w-full h-64 rounded-lg border border-gray-300"></div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Country *</label>
+                            <input type="text" id="country" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Country">
+                            <p class="text-xs text-gray-500 mt-1">Auto-filled from address</p>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">City *</label>
+                            <input type="text" id="city" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="City">
+                            <p class="text-xs text-gray-500 mt-1">Auto-filled from address</p>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Area *</label>
+                            <input type="text" id="area" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Area or neighborhood">
+                            <p class="text-xs text-gray-500 mt-1">Auto-filled from address</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Services & Pricing -->
+            <div class="form-section">
+                <h2 class="text-2xl font-bold text-gray-900 mb-6 flex items-center">
+                    <span class="bg-blue-600 text-white rounded-full w-8 h-8 flex items-center justify-center text-sm mr-3">3</span>
+                    Services & Pricing
+                </h2>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="servicesContainer">
+                    <!-- In-Person Therapy -->
+                    <div class="service-card border border-gray-200 rounded-lg p-4">
+                        <div class="flex items-center justify-between mb-3">
+                            <div class="flex items-center">
+                                <input type="checkbox" id="service_in_person_therapy" class="mr-3" onchange="toggleServiceCheckbox('in_person_therapy')">
+                                <h3 class="font-semibold text-gray-900">In-Person Therapy</h3>
+                            </div>
+                            <span class="text-blue-600 font-medium">45 min</span>
+                        </div>
+                        <p class="text-sm text-gray-600 mb-3">Face-to-face therapy sessions at your office</p>
+                        <div class="price-input" style="display: none;">
+                            <label class="block text-xs font-medium text-gray-700 mb-1">Price per session (€)</label>
+                            <input type="number" id="price_in_person_therapy" min="0" step="5" class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500" placeholder="75" onclick="event.stopPropagation();">
+                        </div>
+                    </div>
+
+                    <!-- Online Therapy -->
+                    <div class="service-card border border-gray-200 rounded-lg p-4">
+                        <div class="flex items-center justify-between mb-3">
+                            <div class="flex items-center">
+                                <input type="checkbox" id="service_online_therapy" class="mr-3" onchange="toggleServiceCheckbox('online_therapy')">
+                                <h3 class="font-semibold text-gray-900">Online Therapy</h3>
+                            </div>
+                            <span class="text-blue-600 font-medium">45 min</span>
+                        </div>
+                        <p class="text-sm text-gray-600 mb-3">Virtual therapy sessions via secure video platform</p>
+                        <div class="price-input" style="display: none;">
+                            <label class="block text-xs font-medium text-gray-700 mb-1">Price per session (€)</label>
+                            <input type="number" id="price_online_therapy" min="0" step="5" class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500" placeholder="65" onclick="event.stopPropagation();">
+                        </div>
+                    </div>
+
+                    <!-- Couples Therapy -->
+                    <div class="service-card border border-gray-200 rounded-lg p-4">
+                        <div class="flex items-center justify-between mb-3">
+                            <div class="flex items-center">
+                                <input type="checkbox" id="service_couples_therapy" class="mr-3" onchange="toggleServiceCheckbox('couples_therapy')">
+                                <h3 class="font-semibold text-gray-900">Couples Therapy</h3>
+                            </div>
+                            <span class="text-blue-600 font-medium">60 min</span>
+                        </div>
+                        <p class="text-sm text-gray-600 mb-3">Relationship counseling for couples</p>
+                        <div class="price-input" style="display: none;">
+                            <label class="block text-xs font-medium text-gray-700 mb-1">Price per session (€)</label>
+                            <input type="number" id="price_couples_therapy" min="0" step="5" class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500" placeholder="100" onclick="event.stopPropagation();">
+                        </div>
+                    </div>
+
+                    <!-- Teen Counseling -->
+                    <div class="service-card border border-gray-200 rounded-lg p-4">
+                        <div class="flex items-center justify-between mb-3">
+                            <div class="flex items-center">
+                                <input type="checkbox" id="service_teen_counseling" class="mr-3" onchange="toggleServiceCheckbox('teen_counseling')">
+                                <h3 class="font-semibold text-gray-900">Teen Counseling</h3>
+                            </div>
+                            <span class="text-blue-600 font-medium">45 min</span>
+                        </div>
+                        <p class="text-sm text-gray-600 mb-3">Specialized counseling for teenagers</p>
+                        <div class="price-input" style="display: none;">
+                            <label class="block text-xs font-medium text-gray-700 mb-1">Price per session (€)</label>
+                            <input type="number" id="price_teen_counseling" min="0" step="5" class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500" placeholder="70" onclick="event.stopPropagation();">
+                        </div>
+                    </div>
+
+                    <!-- Parents Counseling -->
+                    <div class="service-card border border-gray-200 rounded-lg p-4">
+                        <div class="flex items-center justify-between mb-3">
+                            <div class="flex items-center">
+                                <input type="checkbox" id="service_parents_counseling" class="mr-3" onchange="toggleServiceCheckbox('parents_counseling')">
+                                <h3 class="font-semibold text-gray-900">Parent Counseling</h3>
+                            </div>
+                            <span class="text-blue-600 font-medium">45 min</span>
+                        </div>
+                        <p class="text-sm text-gray-600 mb-3">Guidance and support for parents</p>
+                        <div class="price-input" style="display: none;">
+                            <label class="block text-xs font-medium text-gray-700 mb-1">Price per session (€)</label>
+                            <input type="number" id="price_parents_counseling" min="0" step="5" class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500" placeholder="80" onclick="event.stopPropagation();">
+                        </div>
+                    </div>
+
+                    <!-- Psychometric Assessments -->
+                    <div class="service-card border border-gray-200 rounded-lg p-4">
+                        <div class="flex items-center justify-between mb-3">
+                            <div class="flex items-center">
+                                <input type="checkbox" id="service_psychometric_mmpi2" class="mr-3" onchange="toggleServiceCheckbox('psychometric_mmpi2')">
+                                <h3 class="font-semibold text-gray-900">MMPI-2 Assessment</h3>
+                            </div>
+                            <span class="text-blue-600 font-medium">2 hrs</span>
+                        </div>
+                        <p class="text-sm text-gray-600 mb-3">Comprehensive personality assessment</p>
+                        <div class="price-input" style="display: none;">
+                            <label class="block text-xs font-medium text-gray-700 mb-1">Price per assessment (€)</label>
+                            <input type="number" id="price_psychometric_mmpi2" min="0" step="10" class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500" placeholder="150" onclick="event.stopPropagation();">
+                        </div>
+                    </div>
+
+                    <div class="service-card border border-gray-200 rounded-lg p-4">
+                        <div class="flex items-center justify-between mb-3">
+                            <div class="flex items-center">
+                                <input type="checkbox" id="service_psychometric_wais" class="mr-3" onchange="toggleServiceCheckbox('psychometric_wais')">
+                                <h3 class="font-semibold text-gray-900">WAIS Assessment</h3>
+                            </div>
+                            <span class="text-blue-600 font-medium">3 hrs</span>
+                        </div>
+                        <p class="text-sm text-gray-600 mb-3">Intelligence assessment for adults</p>
+                        <div class="price-input" style="display: none;">
+                            <label class="block text-xs font-medium text-gray-700 mb-1">Price per assessment (€)</label>
+                            <input type="number" id="price_psychometric_wais" min="0" step="10" class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500" placeholder="180" onclick="event.stopPropagation();">
+                        </div>
+                    </div>
+
+                    <div class="service-card border border-gray-200 rounded-lg p-4">
+                        <div class="flex items-center justify-between mb-3">
+                            <div class="flex items-center">
+                                <input type="checkbox" id="service_psychometric_wisc" class="mr-3" onchange="toggleServiceCheckbox('psychometric_wisc')">
+                                <h3 class="font-semibold text-gray-900">WISC Assessment</h3>
+                            </div>
+                            <span class="text-blue-600 font-medium">3 hrs</span>
+                        </div>
+                        <p class="text-sm text-gray-600 mb-3">Intelligence assessment for children</p>
+                        <div class="price-input" style="display: none;">
+                            <label class="block text-xs font-medium text-gray-700 mb-1">Price per assessment (€)</label>
+                            <input type="number" id="price_psychometric_wisc" min="0" step="10" class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500" placeholder="160" onclick="event.stopPropagation();">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Therapeutic Approaches -->
+            <div class="form-section">
+                <h2 class="text-2xl font-bold text-gray-900 mb-6 flex items-center">
+                    <span class="bg-blue-600 text-white rounded-full w-8 h-8 flex items-center justify-center text-sm mr-3">4</span>
+                    Therapeutic Approaches
+                </h2>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3" id="therapyApproachesContainer">
+                    <label class="flex items-center space-x-3 p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer">
+                        <input type="checkbox" name="therapy_approaches" value="Cognitive Behavioral Therapy (CBT)" class="form-checkbox">
+                        <span class="text-sm font-medium">Cognitive Behavioral Therapy (CBT)</span>
+                    </label>
+                    
+                    <label class="flex items-center space-x-3 p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer">
+                        <input type="checkbox" name="therapy_approaches" value="Psychodynamic Therapy" class="form-checkbox">
+                        <span class="text-sm font-medium">Psychodynamic Therapy</span>
+                    </label>
+                    
+                    <label class="flex items-center space-x-3 p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer">
+                        <input type="checkbox" name="therapy_approaches" value="Humanistic Therapy" class="form-checkbox">
+                        <span class="text-sm font-medium">Humanistic Therapy</span>
+                    </label>
+                    
+                    <label class="flex items-center space-x-3 p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer">
+                        <input type="checkbox" name="therapy_approaches" value="Eye Movement Desensitization and Reprocessing (EMDR)" class="form-checkbox">
+                        <span class="text-sm font-medium">EMDR</span>
+                    </label>
+                    
+                    <label class="flex items-center space-x-3 p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer">
+                        <input type="checkbox" name="therapy_approaches" value="Dialectical Behavior Therapy (DBT)" class="form-checkbox">
+                        <span class="text-sm font-medium">Dialectical Behavior Therapy (DBT)</span>
+                    </label>
+                    
+                    <label class="flex items-center space-x-3 p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer">
+                        <input type="checkbox" name="therapy_approaches" value="Systemic Therapy" class="form-checkbox">
+                        <span class="text-sm font-medium">Systemic Therapy</span>
+                    </label>
+                    
+                    <label class="flex items-center space-x-3 p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer">
+                        <input type="checkbox" name="therapy_approaches" value="Interpersonal Therapy (IPT)" class="form-checkbox">
+                        <span class="text-sm font-medium">Interpersonal Therapy (IPT)</span>
+                    </label>
+                    
+                    <label class="flex items-center space-x-3 p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer">
+                        <input type="checkbox" name="therapy_approaches" value="Art Therapy" class="form-checkbox">
+                        <span class="text-sm font-medium">Art Therapy</span>
+                    </label>
+                    
+                    <label class="flex items-center space-x-3 p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer">
+                        <input type="checkbox" name="therapy_approaches" value="Person-Centered Therapy" class="form-checkbox">
+                        <span class="text-sm font-medium">Person-Centered Therapy</span>
+                    </label>
+                    
+                    <label class="flex items-center space-x-3 p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer">
+                        <input type="checkbox" name="therapy_approaches" value="Gestalt Therapy" class="form-checkbox">
+                        <span class="text-sm font-medium">Gestalt Therapy</span>
+                    </label>
+                    
+                    <label class="flex items-center space-x-3 p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer">
+                        <input type="checkbox" name="therapy_approaches" value="Eclectic Therapy" class="form-checkbox">
+                        <span class="text-sm font-medium">Eclectic Therapy</span>
+                    </label>
+                    
+                    <label class="flex items-center space-x-3 p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer">
+                        <input type="checkbox" name="therapy_approaches" value="Psychoanalysis" class="form-checkbox">
+                        <span class="text-sm font-medium">Psychoanalysis</span>
+                    </label>
+                </div>
+                
+                <div class="mt-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Other Approaches (specify)</label>
+                    <input type="text" id="otherApproaches" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Enter other therapeutic approaches">
+                </div>
+            </div>
+
+            <!-- Professional Background -->
+            <div class="form-section">
+                <h2 class="text-2xl font-bold text-gray-900 mb-6 flex items-center">
+                    <span class="bg-blue-600 text-white rounded-full w-8 h-8 flex items-center justify-center text-sm mr-3">5</span>
+                    Professional Background
+                </h2>
+                
+                <div class="space-y-6">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Education *</label>
+                        <textarea id="education" required rows="3" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="e.g., PhD in Clinical Psychology, University of Athens; MSc in Cognitive Behavioral Therapy"></textarea>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Experience *</label>
+                        <textarea id="experience" required rows="3" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="e.g., 15 years in private practice, specializing in anxiety disorders and depression"></textarea>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">About You *</label>
+                        <textarea id="about" required rows="4" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Tell potential clients about your approach, specializations, and what they can expect"></textarea>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Languages Spoken *</label>
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-3" id="languagesContainer">
+                            <label class="flex items-center space-x-2">
+                                <input type="checkbox" name="languages" value="Greek" class="form-checkbox">
+                                <span class="text-sm">Greek</span>
+                            </label>
+                            <label class="flex items-center space-x-2">
+                                <input type="checkbox" name="languages" value="English" class="form-checkbox">
+                                <span class="text-sm">English</span>
+                            </label>
+                            <label class="flex items-center space-x-2">
+                                <input type="checkbox" name="languages" value="French" class="form-checkbox">
+                                <span class="text-sm">French</span>
+                            </label>
+                            <label class="flex items-center space-x-2">
+                                <input type="checkbox" name="languages" value="German" class="form-checkbox">
+                                <span class="text-sm">German</span>
+                            </label>
+                            <label class="flex items-center space-x-2">
+                                <input type="checkbox" name="languages" value="Spanish" class="form-checkbox">
+                                <span class="text-sm">Spanish</span>
+                            </label>
+                            <label class="flex items-center space-x-2">
+                                <input type="checkbox" name="languages" value="Italian" class="form-checkbox">
+                                <span class="text-sm">Italian</span>
+                            </label>
+                            <label class="flex items-center space-x-2">
+                                <input type="checkbox" name="languages" value="Russian" class="form-checkbox">
+                                <span class="text-sm">Russian</span>
+                            </label>
+                            <label class="flex items-center space-x-2">
+                                <input type="checkbox" name="languages" value="Arabic" class="form-checkbox">
+                                <span class="text-sm">Arabic</span>
+                            </label>
+                        </div>
+                        <div class="mt-3">
+                            <input type="text" id="otherLanguages" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Other languages (comma separated)">
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Website (optional)</label>
+                        <input type="url" id="website" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="https://your-website.com">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Availability -->
+            <div class="form-section">
+                <h2 class="text-2xl font-bold text-gray-900 mb-6 flex items-center">
+                    <span class="bg-blue-600 text-white rounded-full w-8 h-8 flex items-center justify-center text-sm mr-3">6</span>
+                    Availability Schedule
+                </h2>
+                
+                <div class="space-y-6">
+                    <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                        <h3 class="font-semibold text-blue-900 mb-2">How to set your availability:</h3>
+                        <ul class="text-sm text-blue-800 space-y-1">
+                            <li>• Each service duration: In-person/Online (45min), Couples (60min), Assessments (2-3hrs)</li>
+                            <li>• Click time slots to mark as available</li>
+                            <li>• You can select multiple slots per day</li>
+                            <li>• Leave blank for days you're not available</li>
+                        </ul>
+                    </div>
+                    
+                    <div id="availabilityScheduler">
+                        <!-- Schedule will be generated by JavaScript -->
+                    </div>
+                    
+                    <div class="mt-6">
+                        <h3 class="text-lg font-semibold text-gray-900 mb-4">Closed Office Dates</h3>
+                        <div class="space-y-3">
+                            <div class="flex items-center space-x-4">
+                                <input type="date" id="closedDateStart" class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <span class="text-gray-500">to</span>
+                                <input type="date" id="closedDateEnd" class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <button type="button" onclick="addClosedDate()" class="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700">Add</button>
+                            </div>
+                            <div id="closedDatesList" class="space-y-2"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Submit Button -->
+            <div class="text-center">
+                <button type="submit" class="bg-gradient-to-r from-blue-600 to-blue-800 hover:from-blue-700 hover:to-blue-900 text-white font-bold py-4 px-8 rounded-lg text-lg transition-all duration-300 transform hover:scale-105">
+                    Register as Therapist
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        // Global variables
+        let map;
+        let marker;
+        let selectedLocation = null;
+        let photoFile = null;
+        let availabilityData = {};
+        let closedDates = [];
+
+        // Initialize Google Maps
+        function initMap() {
+            const defaultLocation = { lat: 37.9838, lng: 23.7275 }; // Athens center
+            
+            map = new google.maps.Map(document.getElementById('map'), {
+                zoom: 12,
+                center: defaultLocation
+            });
+
+            marker = new google.maps.Marker({
+                position: defaultLocation,
+                map: map,
+                draggable: true
+            });
+
+            // Click event for map
+            map.addListener('click', function(event) {
+                updateMarkerPosition(event.latLng);
+            });
+
+            // Drag event for marker
+            marker.addListener('dragend', function(event) {
+                updateMarkerPosition(event.latLng);
+            });
+
+            // Initialize enhanced autocomplete for address input
+            const autocomplete = new google.maps.places.Autocomplete(
+                document.getElementById('officeAddress'),
+                {
+                    types: ['address'],
+                    componentRestrictions: {}, // No country restrictions for global support
+                    fields: ['address_components', 'formatted_address', 'geometry']
+                }
+            );
+            autocomplete.bindTo('bounds', map);
+            
+            autocomplete.addListener('place_changed', function() {
+                const place = autocomplete.getPlace();
+                if (place.geometry) {
+                    map.setCenter(place.geometry.location);
+                    map.setZoom(17);
+                    updateMarkerPosition(place.geometry.location);
+                    
+                    // Also extract components directly from place for immediate autofill
+                    if (place.address_components) {
+                        let country = '', city = '', area = '';
+                        
+                        place.address_components.forEach(component => {
+                            if (component.types.includes('country')) {
+                                country = component.long_name;
+                            }
+                            if (component.types.includes('locality')) {
+                                city = component.long_name;
+                            }
+                            // Extract area (neighborhood/district level within city)
+                            if (!area && component.types.includes('sublocality_level_1')) {
+                                area = component.long_name; // Primary: Specific neighborhood
+                            }
+                            if (!area && component.types.includes('sublocality')) {
+                                area = component.long_name; // Fallback: General sublocality
+                            }
+                            if (!area && component.types.includes('sublocality_level_2')) {
+                                area = component.long_name; // Fallback: More specific area
+                            }
+                        });
+                        
+                        // Always clear and fill all fields (even if empty)
+                        document.getElementById('country').value = country;
+                        document.getElementById('city').value = city;
+                        document.getElementById('area').value = area;
+                    }
+                }
+            });
+        }
+
+        function updateMarkerPosition(latLng) {
+            marker.setPosition(latLng);
+            selectedLocation = {
+                lat: latLng.lat(),
+                lng: latLng.lng()
+            };
+            
+            // Reverse geocoding to get address
+            const geocoder = new google.maps.Geocoder();
+            geocoder.geocode({ location: latLng }, function(results, status) {
+                if (status === 'OK' && results[0]) {
+                    document.getElementById('officeAddress').value = results[0].formatted_address;
+                    
+                    // Extract country, city and area from address components
+                    const components = results[0].address_components;
+                    let country = '';
+                    let city = '';
+                    let area = '';
+                    
+                    components.forEach(component => {
+                        // Extract country
+                        if (component.types.includes('country')) {
+                            country = component.long_name;
+                        }
+                        // Extract city (main city level)
+                        if (component.types.includes('locality')) {
+                            city = component.long_name;
+                        }
+                        // Extract area (neighborhood/district level within city)
+                        if (!area && component.types.includes('sublocality_level_1')) {
+                            area = component.long_name; // Primary: Specific neighborhood
+                        }
+                        if (!area && component.types.includes('sublocality')) {
+                            area = component.long_name; // Fallback: General sublocality
+                        }
+                        if (!area && component.types.includes('sublocality_level_2')) {
+                            area = component.long_name; // Fallback: More specific area
+                        }
+                    });
+                    
+                    // Always clear and fill all fields (even if empty)
+                    document.getElementById('country').value = country;
+                    document.getElementById('city').value = city;
+                    document.getElementById('area').value = area;
+                }
+            });
+        }
+
+        // Photo upload handling
+        function handlePhotoUpload(input) {
+            const file = input.files[0];
+            if (file) {
+                if (file.size > 5 * 1024 * 1024) {
+                    alert('Photo size should be less than 5MB');
+                    return;
+                }
+                
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('previewImage').src = e.target.result;
+                    document.getElementById('photoPreview').classList.remove('hidden');
+                    document.getElementById('photoPlaceholder').classList.add('hidden');
+                    photoFile = file;
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        // Service toggle functionality
+        function toggleServiceCheckbox(serviceKey) {
+            const checkbox = document.getElementById(`service_${serviceKey}`);
+            const card = checkbox.closest('.service-card');
+            const priceInput = card.querySelector('.price-input');
+            
+            if (checkbox.checked) {
+                card.classList.add('selected');
+                priceInput.style.display = 'block';
+                // Focus on price input to make editing easier
+                setTimeout(() => {
+                    const priceField = priceInput.querySelector('input');
+                    if (priceField) priceField.focus();
+                }, 100);
+            } else {
+                card.classList.remove('selected');
+                priceInput.style.display = 'none';
+            }
+        }
+
+        // Generate availability scheduler
+        function generateAvailabilityScheduler() {
+            const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+            const timeSlots = [];
+            
+            // Generate hourly time slots from 8:00 to 20:00
+            for (let hour = 8; hour <= 20; hour++) {
+                timeSlots.push(`${hour.toString().padStart(2, '0')}:00`);
+            }
+
+            const scheduler = document.getElementById('availabilityScheduler');
+            let html = '<div class="overflow-x-auto"><table class="w-full border-collapse border border-gray-200">';
+            
+            // Header
+            html += '<thead><tr><th class="border border-gray-200 p-2 bg-gray-50">Time</th>';
+            days.forEach(day => {
+                html += `<th class="border border-gray-200 p-2 bg-gray-50">${day}</th>`;
+            });
+            html += '</tr></thead><tbody>';
+            
+            // Time slots
+            timeSlots.forEach(time => {
+                html += `<tr><td class="border border-gray-200 p-2 font-medium">${time}</td>`;
+                days.forEach((day, dayIndex) => {
+                    const slotId = `${day.toLowerCase()}_${time.replace(':', '')}`;
+                    html += `<td class="border border-gray-200 p-1">
+                        <button type="button" onclick="toggleAvailabilitySlot('${slotId}')" 
+                                class="availability-slot w-full h-8 text-xs rounded border border-gray-300 hover:bg-blue-100" 
+                                id="slot_${slotId}">
+                            Available
+                        </button>
+                    </td>`;
+                });
+                html += '</tr>';
+            });
+            
+            html += '</tbody></table></div>';
+            scheduler.innerHTML = html;
+        }
+
+        function toggleAvailabilitySlot(slotId) {
+            const button = document.getElementById(`slot_${slotId}`);
+            
+            if (availabilityData[slotId]) {
+                delete availabilityData[slotId];
+                button.classList.remove('selected');
+                button.textContent = 'Available';
+            } else {
+                availabilityData[slotId] = true;
+                button.classList.add('selected');
+                button.textContent = 'Selected';
+            }
+        }
+
+        // Closed dates management
+        function addClosedDate() {
+            const startDate = document.getElementById('closedDateStart').value;
+            const endDate = document.getElementById('closedDateEnd').value;
+            
+            if (!startDate) {
+                alert('Please select a start date');
+                return;
+            }
+            
+            const closedPeriod = {
+                start: startDate,
+                end: endDate || startDate,
+                id: Date.now()
+            };
+            
+            closedDates.push(closedPeriod);
+            updateClosedDatesList();
+            
+            // Clear inputs
+            document.getElementById('closedDateStart').value = '';
+            document.getElementById('closedDateEnd').value = '';
+        }
+
+        function removeClosedDate(id) {
+            closedDates = closedDates.filter(date => date.id !== id);
+            updateClosedDatesList();
+        }
+
+        function updateClosedDatesList() {
+            const container = document.getElementById('closedDatesList');
+            
+            if (closedDates.length === 0) {
+                container.innerHTML = '<p class="text-sm text-gray-500">No closed dates added</p>';
+                return;
+            }
+            
+            let html = '';
+            closedDates.forEach(period => {
+                const dateRange = period.end && period.end !== period.start 
+                    ? `${period.start} to ${period.end}` 
+                    : period.start;
+                    
+                html += `
+                    <div class="flex items-center justify-between bg-gray-50 p-3 rounded-lg">
+                        <span class="text-sm">${dateRange}</span>
+                        <button type="button" onclick="removeClosedDate(${period.id})" 
+                                class="text-red-600 hover:text-red-800 text-sm">Remove</button>
+                    </div>
+                `;
+            });
+            
+            container.innerHTML = html;
+        }
+
+        // Form submission
+        document.getElementById('therapistRegistrationForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            if (!validateForm()) {
+                return;
+            }
+            
+            const therapistData = collectFormData();
+            addTherapistToSystem(therapistData);
+        });
+
+        function validateForm() {
+            const requiredFields = ['firstName', 'lastName', 'title', 'officeAddress', 'country', 'city', 'area', 'education', 'experience', 'about'];
+            
+            for (const field of requiredFields) {
+                const element = document.getElementById(field);
+                if (!element.value.trim()) {
+                    // Custom field name mapping
+                    const fieldNames = {
+                        'firstName': 'first name',
+                        'lastName': 'last name', 
+                        'officeAddress': 'office address',
+                        'area': 'area'
+                    };
+                    const displayName = fieldNames[field] || field.replace(/([A-Z])/g, ' $1').toLowerCase();
+                    alert(`Please fill in the ${displayName} field`);
+                    element.focus();
+                    return false;
+                }
+            }
+            
+            if (!photoFile) {
+                alert('Please upload a professional photo');
+                return false;
+            }
+            
+            if (!selectedLocation) {
+                alert('Please select your office location on the map');
+                return false;
+            }
+            
+            // Check if at least one service is selected
+            const selectedServices = document.querySelectorAll('#servicesContainer input[type="checkbox"]:checked');
+            if (selectedServices.length === 0) {
+                alert('Please select at least one service you offer');
+                return false;
+            }
+            
+            // Check if at least one therapy approach is selected
+            const selectedApproaches = document.querySelectorAll('input[name="therapy_approaches"]:checked');
+            if (selectedApproaches.length === 0) {
+                alert('Please select at least one therapeutic approach');
+                return false;
+            }
+            
+            // Check if at least one language is selected
+            const selectedLanguages = document.querySelectorAll('input[name="languages"]:checked');
+            if (selectedLanguages.length === 0) {
+                alert('Please select at least one language you speak');
+                return false;
+            }
+            
+            return true;
+        }
+
+        function collectFormData() {
+            // Collect basic info
+            const firstName = document.getElementById('firstName').value.trim();
+            const lastName = document.getElementById('lastName').value.trim();
+            const title = document.getElementById('title').value;
+            const gender = document.getElementById('gender').value;
+            
+            // Collect location info
+            const address = document.getElementById('officeAddress').value.trim();
+            const country = document.getElementById('country').value.trim();
+            const city = document.getElementById('city').value.trim();
+            const area = document.getElementById('area').value.trim();
+            
+            // Collect professional info
+            const education = document.getElementById('education').value.trim();
+            const experience = document.getElementById('experience').value.trim();
+            const about = document.getElementById('about').value.trim();
+            const website = document.getElementById('website').value.trim();
+            
+            // Collect services
+            const services = {};
+            const serviceCheckboxes = document.querySelectorAll('#servicesContainer input[type="checkbox"]:checked');
+            serviceCheckboxes.forEach(checkbox => {
+                const serviceKey = checkbox.id.replace('service_', '');
+                const priceInput = document.getElementById(`price_${serviceKey}`);
+                const price = parseInt(priceInput.value) || getDefaultPrice(serviceKey);
+                
+                services[serviceKey] = {
+                    available: true,
+                    price: price,
+                    description: getServiceDescription(serviceKey, firstName, lastName),
+                    duration: getServiceDuration(serviceKey)
+                };
+                
+                if (serviceKey === 'in_person_therapy') {
+                    services[serviceKey].location = address;
+                } else if (serviceKey === 'online_therapy') {
+                    services[serviceKey].platform = 'Secure video consultation';
+                }
+            });
+            
+            // Collect therapy approaches
+            const therapyApproaches = [];
+            const therapyApproachesKeys = [];
+            const approachCheckboxes = document.querySelectorAll('input[name="therapy_approaches"]:checked');
+            approachCheckboxes.forEach(checkbox => {
+                therapyApproaches.push(checkbox.value);
+                therapyApproachesKeys.push(getApproachKey(checkbox.value));
+            });
+            
+            // Add other approaches if specified
+            const otherApproaches = document.getElementById('otherApproaches').value.trim();
+            if (otherApproaches) {
+                const otherList = otherApproaches.split(',').map(item => item.trim()).filter(item => item);
+                therapyApproaches.push(...otherList);
+                therapyApproachesKeys.push(...otherList.map(item => item.toLowerCase().replace(/\s+/g, '_')));
+            }
+            
+            // Collect languages
+            const languages = [];
+            const languageKeys = [];
+            const languageCheckboxes = document.querySelectorAll('input[name="languages"]:checked');
+            languageCheckboxes.forEach(checkbox => {
+                languages.push(checkbox.value);
+                languageKeys.push(checkbox.value.toLowerCase());
+            });
+            
+            // Add other languages if specified
+            const otherLanguages = document.getElementById('otherLanguages').value.trim();
+            if (otherLanguages) {
+                const otherLangList = otherLanguages.split(',').map(item => item.trim()).filter(item => item);
+                languages.push(...otherLangList);
+                languageKeys.push(...otherLangList.map(item => item.toLowerCase()));
+            }
+            
+            // Generate new therapist ID - ensure it doesn't conflict with static therapists (1-22) or existing registered ones
+            const existingRegistered = localStorage.getItem('therapistData');
+            let maxRegisteredId = 1000; // Start registered therapists at ID 1000 to avoid conflicts
+            
+            if (existingRegistered) {
+                try {
+                    const registered = JSON.parse(existingRegistered);
+                    if (registered.length > 0) {
+                        maxRegisteredId = Math.max(...registered.map(t => t.id)) + 1;
+                    }
+                } catch (e) {
+                    console.error('Error parsing existing registered therapists for ID generation:', e);
+                }
+            }
+            
+            const newId = maxRegisteredId;
+            
+            // Calculate default cost (average of selected services)
+            const servicePrices = Object.values(services).map(s => s.price);
+            const defaultCost = servicePrices.length > 0 ? Math.round(servicePrices.reduce((a, b) => a + b, 0) / servicePrices.length) : 75;
+            
+            // Convert photo to base64 or save reference
+            const photoSrc = document.getElementById('previewImage').src;
+            
+            // Create therapist object
+            const therapistData = {
+                id: newId,
+                first_name: firstName,
+                last_name: lastName,
+                gender: gender || 'female',
+                title: title,
+                photo: photoSrc,
+                address: address,
+                country: country,
+                countryKey: country.toLowerCase().replace(/\s+/g, '_'),
+                city: city,
+                cityKey: city.toLowerCase().replace(/\s+/g, '_'),
+                area: area,
+                areaKey: area.toLowerCase().replace(/\s+/g, '_'),
+                therapy_approaches: therapyApproaches,
+                therapy_approaches_keys: therapyApproachesKeys,
+                languages: languages,
+                languageKeys: languageKeys,
+                cost: defaultCost,
+                currency: "EUR",
+                services: services,
+                psychometric_assessments: getPsychometricAssessments(services),
+                experience: experience,
+                education: education,
+                about: about,
+                website: website,
+                image: photoSrc,
+                rating: 4.5, // Default rating for new therapists
+                availability: getAvailabilitySummary(),
+                availabilityKey: getAvailabilitySummary().toLowerCase(),
+                distance: 0, // Will be calculated based on user location
+                coordinates: selectedLocation,
+                closedDates: closedDates,
+                availabilitySchedule: availabilityData
+            };
+            
+            return therapistData;
+        }
+
+        function getDefaultPrice(serviceKey) {
+            const defaultPrices = {
+                'in_person_therapy': 75,
+                'online_therapy': 65,
+                'couples_therapy': 100,
+                'teen_counseling': 70,
+                'parents_counseling': 80,
+                'psychometric_mmpi2': 150,
+                'psychometric_wais': 180,
+                'psychometric_wisc': 160
+            };
+            return defaultPrices[serviceKey] || 75;
+        }
+
+        function getServiceDescription(serviceKey, firstName, lastName) {
+            const descriptions = {
+                'in_person_therapy': `Face-to-face therapy at our office. Time varies depending on type but usually around 45 min`,
+                'online_therapy': `Connect online with your therapist from home. Time varies depending on type but usually around 45 min`,
+                'couples_therapy': `Relationship counseling for couples. Time varies depending on type but usually around 45 min`,
+                'teen_counseling': `Specialized counseling for teenagers. Time varies depending on type but usually around 45 min`,
+                'parents_counseling': `Guidance and support for parents. Time varies depending on type but usually around 45 min`,
+                'psychometric_mmpi2': `Comprehensive personality assessment using MMPI-2. Time may vary but usually takes around 2 hours`,
+                'psychometric_wais': `Intelligence assessment for adults using WAIS. Time may vary but usually takes around 2.5-3 hours`,
+                'psychometric_wisc': `Intelligence assessment for children using WISC. Time may vary but usually takes around 2.5-3 hours`
+            };
+            return descriptions[serviceKey] || `Professional service with Dr. ${firstName} ${lastName}`;
+        }
+
+        function getServiceDuration(serviceKey) {
+            const durations = {
+                'in_person_therapy': 1,
+                'online_therapy': 1,
+                'couples_therapy': 1,
+                'teen_counseling': 1,
+                'parents_counseling': 1,
+                'psychometric_mmpi2': 2,
+                'psychometric_wais': 3,
+                'psychometric_wisc': 3
+            };
+            return durations[serviceKey] || 1;
+        }
+
+        function getApproachKey(approach) {
+            const keyMap = {
+                'Cognitive Behavioral Therapy (CBT)': 'cbt',
+                'Psychodynamic Therapy': 'psychodynamic',
+                'Humanistic Therapy': 'humanistic',
+                'Eye Movement Desensitization and Reprocessing (EMDR)': 'emdr',
+                'Dialectical Behavior Therapy (DBT)': 'dbt',
+                'Systemic Therapy': 'systemic',
+                'Interpersonal Therapy (IPT)': 'ipt',
+                'Art Therapy': 'art',
+                'Person-Centered Therapy': 'person-centered',
+                'Gestalt Therapy': 'gestalt',
+                'Eclectic Therapy': 'eclectic',
+                'Psychoanalysis': 'psychoanalysis'
+            };
+            return keyMap[approach] || approach.toLowerCase().replace(/\s+/g, '_');
+        }
+
+        function getPsychometricAssessments(services) {
+            const assessments = [];
+            if (services['psychometric_mmpi2']?.available) assessments.push('MMPI-2');
+            if (services['psychometric_wais']?.available) assessments.push('WAIS');
+            if (services['psychometric_wisc']?.available) assessments.push('WISC');
+            return assessments;
+        }
+
+        function getAvailabilitySummary() {
+            const morningSlots = Object.keys(availabilityData).filter(slot => {
+                const time = slot.split('_')[1];
+                const hour = parseInt(time.substring(0, 2));
+                return hour >= 8 && hour < 12;
+            });
+            
+            const afternoonSlots = Object.keys(availabilityData).filter(slot => {
+                const time = slot.split('_')[1];
+                const hour = parseInt(time.substring(0, 2));
+                return hour >= 12 && hour < 17;
+            });
+            
+            const eveningSlots = Object.keys(availabilityData).filter(slot => {
+                const time = slot.split('_')[1];
+                const hour = parseInt(time.substring(0, 2));
+                return hour >= 17 && hour <= 20;
+            });
+            
+            if (morningSlots.length > afternoonSlots.length && morningSlots.length > eveningSlots.length) {
+                return 'Morning';
+            } else if (afternoonSlots.length > eveningSlots.length) {
+                return 'Afternoon';
+            } else if (eveningSlots.length > 0) {
+                return 'Evening';
+            } else {
+                return 'Flexible';
+            }
+        }
+
+        function addTherapistToSystem(therapistData) {
+            try {
+                // FIXED: Save only NEW registered therapists to localStorage, not the entire array
+                
+                // Get existing registered therapists (not static ones)
+                const existingRegistered = localStorage.getItem('therapistData');
+                let registeredTherapists = [];
+                
+                if (existingRegistered) {
+                    try {
+                        registeredTherapists = JSON.parse(existingRegistered);
+                    } catch (e) {
+                        console.error('Error parsing existing registered therapists:', e);
+                        registeredTherapists = [];
+                    }
+                }
+                
+                // Remove any existing therapist with same ID (for updates)
+                registeredTherapists = registeredTherapists.filter(t => t.id !== therapistData.id);
+                
+                // Add the new therapist to registered therapists only
+                registeredTherapists.push(therapistData);
+                
+                // Save only the registered therapists to localStorage
+                localStorage.setItem('therapistData', JSON.stringify(registeredTherapists));
+                
+                // Handle coordinates separately
+                const existingCoords = localStorage.getItem('therapistCoordinates');
+                let coordsObject = {};
+                
+                if (existingCoords) {
+                    try {
+                        coordsObject = JSON.parse(existingCoords);
+                    } catch (e) {
+                        console.error('Error parsing existing coordinates:', e);
+                        coordsObject = {};
+                    }
+                }
+                
+                coordsObject[therapistData.id] = therapistData.coordinates;
+                localStorage.setItem('therapistCoordinates', JSON.stringify(coordsObject));
+                
+                // TRIGGER INTEGRATION: Immediately update the main system
+                console.log('🎯 REGISTRATION: Triggering integration with main system...');
+                
+                // Try to trigger integration functions if available
+                setTimeout(() => {
+                    if (window.loadAndMergeLocalStorageTherapists) {
+                        console.log('🔄 REGISTRATION: Triggering localStorage integration...');
+                        const added = window.loadAndMergeLocalStorageTherapists();
+                        console.log(`✅ REGISTRATION: Integration complete - ${added.length} therapists added to main system`);
+                    } else {
+                        console.log('⚠️ REGISTRATION: Integration functions not available - therapist saved to localStorage only');
+                    }
+                }, 500);
+                
+                // Show success message
+                alert(`Success! Dr. ${therapistData.first_name} ${therapistData.last_name} has been registered as a therapist.\\n\\nTherapist ID: ${therapistData.id}\\nLocation: ${therapistData.area}, ${therapistData.city}\\nServices: ${Object.keys(therapistData.services).length} services offered\\n\\nThe therapist will now appear in the Find Therapist section.`);
+                
+                // Reset form
+                document.getElementById('therapistRegistrationForm').reset();
+                resetFormState();
+                
+                console.log('New therapist added:', therapistData);
+                
+            } catch (error) {
+                console.error('Error adding therapist:', error);
+                alert('There was an error registering the therapist. Please try again.');
+            }
+        }
+
+        function resetFormState() {
+            // Reset photo upload
+            document.getElementById('photoPreview').classList.add('hidden');
+            document.getElementById('photoPlaceholder').classList.remove('hidden');
+            photoFile = null;
+            
+            // Reset service cards
+            document.querySelectorAll('.service-card').forEach(card => {
+                card.classList.remove('selected');
+                const priceInput = card.querySelector('.price-input');
+                if (priceInput) {
+                    priceInput.style.display = 'none';
+                }
+            });
+            
+            // Reset availability
+            availabilityData = {};
+            document.querySelectorAll('.availability-slot').forEach(slot => {
+                slot.classList.remove('selected');
+                slot.textContent = 'Available';
+            });
+            
+            // Reset closed dates
+            closedDates = [];
+            updateClosedDatesList();
+            
+            // Reset map
+            if (map && marker) {
+                const defaultLocation = { lat: 37.9838, lng: 23.7275 };
+                map.setCenter(defaultLocation);
+                marker.setPosition(defaultLocation);
+                selectedLocation = null;
+            }
+        }
+
+        // Initialize everything when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            generateAvailabilityScheduler();
+            updateClosedDatesList();
+            
+            // Load existing therapist data from localStorage if available
+            const savedData = localStorage.getItem('therapistData');
+            const savedCoordinates = localStorage.getItem('therapistCoordinates');
+            
+            if (savedData) {
+                try {
+                    window.therapistData = JSON.parse(savedData);
+                    console.log('Loaded existing therapist data from localStorage');
+                } catch (e) {
+                    console.log('No valid saved therapist data found');
+                }
+            }
+            
+            if (savedCoordinates) {
+                try {
+                    window.therapistAddressCoordinates = JSON.parse(savedCoordinates);
+                    console.log('Loaded existing coordinates data from localStorage');
+                } catch (e) {
+                    console.log('No valid saved coordinates data found');
+                }
+            }
+        });
+
+        // Initialize map when page loads
+        window.onload = function() {
+            initMap();
+        };
+
+
+         function hideAddressAnalysisMessage() {
+             const msg = document.getElementById('address-analysis-msg');
+             if (msg && msg.parentNode) {
+                 msg.style.opacity = '0';
+                 msg.style.transition = 'opacity 0.3s ease';
+                 setTimeout(() => {
+                     if (msg.parentNode) msg.remove();
+                 }, 300);
+             }
+         }
+
+         // Show error message
+         function showAddressAnalysisError(errorMessage) {
+             let errorMsg = document.getElementById('address-analysis-msg');
+             if (!errorMsg) {
+                 errorMsg = document.createElement('div');
+                 errorMsg.id = 'address-analysis-msg';
+                 errorMsg.className = 'mt-2 p-3 rounded-lg text-sm';
+                 document.getElementById('officeAddress').parentNode.appendChild(errorMsg);
+             }
+             
+             // Update to error state
+             errorMsg.className = 'mt-2 p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-700';
+             errorMsg.innerHTML = `
+                 <div class="flex items-center">
+                     <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                         <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                     </svg>
+                     <span><strong>⚠️ Address analysis failed:</strong> ${errorMessage}</span>
+                 </div>
+             `;
+             
+             // Hide after 8 seconds
+             setTimeout(() => {
+                 if (errorMsg && errorMsg.parentNode) {
+                     errorMsg.style.opacity = '0';
+                     errorMsg.style.transition = 'opacity 0.5s ease';
+                     setTimeout(() => {
+                         if (errorMsg.parentNode) errorMsg.remove();
+                     }, 500);
+                 }
+             }, 8000);
+         }
+    </script>
+</body>
+</html> 

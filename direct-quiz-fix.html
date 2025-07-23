@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Quiz Button Fix</title>
+</head>
+<body>
+    <script>
+    // DIRECT QUIZ BUTTON FIX - Simple and reliable
+    console.log('🔧 DIRECT QUIZ FIX: Loading...');
+    
+    function directQuizFix() {
+        console.log('🎯 DIRECT FIX: Executing...');
+        
+        // Step 1: Hide all other steps immediately
+        ['therapist-step-1', 'therapist-step-2', 'therapist-step-3-location', 'therapist-step-3-criteria'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) {
+                el.style.display = 'none';
+                el.classList.add('hidden');
+                console.log(`✅ Hidden: ${id}`);
+            }
+        });
+        
+        // Step 2: Show quiz step immediately
+        const quizStep = document.getElementById('therapist-step-3-quiz');
+        if (quizStep) {
+            quizStep.style.display = 'block';
+            quizStep.style.visibility = 'visible';
+            quizStep.classList.remove('hidden');
+            quizStep.scrollIntoView({ behavior: 'smooth' });
+            console.log('✅ Quiz step shown');
+            return true;
+        } else {
+            console.error('❌ Quiz step not found');
+            return false;
+        }
+    }
+    
+    // Override any existing functions
+    window.navigateToTherapistStepThreeQuiz = directQuizFix;
+    window.directQuizFix = directQuizFix;
+    
+    // Find and fix quiz buttons after page loads
+    function fixQuizButtons() {
+        console.log('🔧 Fixing quiz buttons...');
+        
+        // Method 1: Find any element with quiz-related onclick
+        document.querySelectorAll('[onclick*="Quiz"], [onclick*="quiz"]').forEach(btn => {
+            console.log('🔧 Found quiz button, fixing...');
+            btn.onclick = function(e) {
+                e.preventDefault();
+                console.log('🖱️ Quiz button clicked - direct fix');
+                directQuizFix();
+            };
+        });
+        
+        // Method 2: Find buttons by text content
+        document.querySelectorAll('button').forEach(btn => {
+            if (btn.textContent.toLowerCase().includes('quiz') || btn.textContent.toLowerCase().includes('personalized')) {
+                console.log('🔧 Found quiz text button, fixing...');
+                btn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    console.log('🖱️ Quiz text button clicked - direct fix');
+                    directQuizFix();
+                });
+            }
+        });
+    }
+    
+    // Run fix multiple times
+    setTimeout(fixQuizButtons, 100);
+    setTimeout(fixQuizButtons, 1000);
+    setTimeout(fixQuizButtons, 3000);
+    
+    // Make test function available globally
+    window.testDirectQuizFix = function() {
+        console.log('🧪 Testing direct quiz fix...');
+        return directQuizFix();
+    };
+    
+    console.log('✅ DIRECT QUIZ FIX: Ready');
+    console.log('🧪 Test with: window.testDirectQuizFix()');
+    </script>
+    
+    <!-- Emergency button for testing -->
+    <button onclick="window.testDirectQuizFix()" style="position: fixed; top: 10px; right: 10px; z-index: 9999; background: red; color: white; padding: 10px; border: none; border-radius: 5px;">
+        TEST QUIZ
+    </button>
+</body>
+</html> 

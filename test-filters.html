@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Filter Fix</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 p-8">
+    <div class="max-w-2xl mx-auto">
+        <h1 class="text-2xl font-bold mb-6">🧪 Filter Fix Test</h1>
+        
+        <div class="bg-white rounded-lg p-6 shadow-lg mb-6">
+            <h2 class="text-lg font-semibold mb-4">Test Filters</h2>
+            
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium mb-2">City Filter</label>
+                    <select id="city-filter" class="w-full p-2 border border-gray-300 rounded">
+                        <option value="">All Cities</option>
+                        <!-- These hardcoded options should be replaced -->
+                        <option value="athens">Athens</option>
+                        <option value="paris">Paris</option>
+                        <option value="rome">Rome</option>
+                        <option value="berlin">Berlin</option>
+                        <option value="london">London</option>
+                    </select>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium mb-2">Therapy Approach Filter</label>
+                    <select id="therapy-approach-filter" class="w-full p-2 border border-gray-300 rounded">
+                        <option value="">All Approaches</option>
+                        <!-- These should be replaced -->
+                        <option value="cbt">CBT</option>
+                        <option value="psychodynamic">Psychodynamic</option>
+                    </select>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium mb-2">Language Filter</label>
+                    <select id="language-filter" class="w-full p-2 border border-gray-300 rounded">
+                        <option value="">All Languages</option>
+                    </select>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium mb-2">Title Filter</label>
+                    <select id="title-filter" class="w-full p-2 border border-gray-300 rounded">
+                        <option value="">All Titles</option>
+                    </select>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium mb-2">Gender Filter</label>
+                    <select id="gender-filter" class="w-full p-2 border border-gray-300 rounded">
+                        <option value="">All Genders</option>
+                    </select>
+                </div>
+            </div>
+            
+            <button onclick="runTest()" class="mt-4 bg-blue-500 text-white px-4 py-2 rounded">Run Test</button>
+        </div>
+        
+        <div class="bg-white rounded-lg p-6 shadow-lg">
+            <h2 class="text-lg font-semibold mb-4">Test Results</h2>
+            <div id="test-results" class="text-sm font-mono bg-gray-50 p-4 rounded"></div>
+        </div>
+    </div>
+
+    <!-- Load the same scripts as user-panel.html -->
+    <script src="therapist-data.js"></script>
+    <script src="instant-filter-override.js"></script>
+    
+    <script>
+        function runTest() {
+            const results = document.getElementById('test-results');
+            let report = [];
+            
+            report.push('🧪 FILTER TEST RESULTS');
+            report.push('═'.repeat(40));
+            
+            // Check therapist data
+            if (window.therapistData) {
+                report.push(`✅ Therapist data loaded: ${window.therapistData.length} therapists`);
+                
+                // Look for specific therapists
+                const zografouTherapist = window.therapistData.find(t => 
+                    t.area && t.area.toLowerCase().includes('zografou')
+                );
+                if (zografouTherapist) {
+                    report.push(`✅ Zografou therapist found: Dr. ${zografouTherapist.first_name} ${zografouTherapist.last_name}`);
+                } else {
+                    report.push('❌ Zografou therapist not found');
+                }
+                
+                const systemicTherapist = window.therapistData.find(t => 
+                    t.therapy_approaches && t.therapy_approaches.some(a => a.toLowerCase().includes('systemic'))
+                );
+                if (systemicTherapist) {
+                    report.push(`✅ Systemic therapy therapist found: Dr. ${systemicTherapist.first_name} ${systemicTherapist.last_name}`);
+                } else {
+                    report.push('❌ Systemic therapy therapist not found');
+                }
+            } else {
+                report.push('❌ Therapist data not loaded');
+            }
+            
+            report.push('');
+            report.push('FILTER ANALYSIS:');
+            
+            // Check each filter
+            const filters = [
+                { id: 'city-filter', name: 'City' },
+                { id: 'therapy-approach-filter', name: 'Therapy Approach' },
+                { id: 'language-filter', name: 'Language' },
+                { id: 'title-filter', name: 'Title' },
+                { id: 'gender-filter', name: 'Gender' }
+            ];
+            
+            filters.forEach(filter => {
+                const element = document.getElementById(filter.id);
+                if (element) {
+                    report.push(`${filter.name}: ${element.options.length} options`);
+                    
+                    // Show first few options
+                    Array.from(element.options).slice(1, 4).forEach(opt => {
+                        report.push(`  - ${opt.text} (${opt.value})`);
+                    });
+                    if (element.options.length > 4) {
+                        report.push(`  ... and ${element.options.length - 4} more`);
+                    }
+                } else {
+                    report.push(`${filter.name}: Element not found`);
+                }
+            });
+            
+            // Specific checks
+            report.push('');
+            report.push('SPECIFIC CHECKS:');
+            
+            const cityFilter = document.getElementById('city-filter');
+            if (cityFilter) {
+                const hasZografou = Array.from(cityFilter.options).some(opt => 
+                    opt.value.toLowerCase().includes('zografou')
+                );
+                report.push(`Zografou in city filter: ${hasZografou ? '✅ YES' : '❌ NO'}`);
+            }
+            
+            const approachFilter = document.getElementById('therapy-approach-filter');
+            if (approachFilter) {
+                const hasSystemic = Array.from(approachFilter.options).some(opt => 
+                    opt.text.toLowerCase().includes('systemic')
+                );
+                report.push(`Systemic in approach filter: ${hasSystemic ? '✅ YES' : '❌ NO'}`);
+            }
+            
+            // Test instant override function
+            report.push('');
+            report.push('FUNCTION TEST:');
+            if (typeof window.INSTANT_OVERRIDE_FILTERS === 'function') {
+                report.push('✅ INSTANT_OVERRIDE_FILTERS function available');
+                report.push('Running manual override...');
+                
+                const result = window.INSTANT_OVERRIDE_FILTERS();
+                report.push(`Manual override result: ${result ? '✅ SUCCESS' : '❌ FAILED'}`);
+            } else {
+                report.push('❌ INSTANT_OVERRIDE_FILTERS function not available');
+            }
+            
+            results.textContent = report.join('\n');
+        }
+        
+        // Auto-run test after a delay
+        setTimeout(runTest, 2000);
+    </script>
+</body>
+</html> 

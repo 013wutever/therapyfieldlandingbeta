@@ -30605,7 +30605,8 @@ window.populateTherapistCards = function() {
   currentTherapists.forEach((therapist, index) => {
     const globalIndex = startIndex + index;
     const card = document.createElement('div');
-    card.className = 'bg-white rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 overflow-hidden ';
+    card.className = 'bg-white rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 overflow-hidden';
+    card.style.border = '1px solid #001233';  // Thin border with specified color
     
     const distanceText = therapist.distance ? `${therapist.distance.toFixed(1)} km away` : 'Distance unknown';
     const photoSrc = therapist.photo || 'therapist1.png';
@@ -30635,17 +30636,16 @@ window.populateTherapistCards = function() {
             </div>
           </div>
           ${isMobile ? `<div class="mt-3">` : `<div class="flex-1 min-w-0">`}
-            <h3 class="${textSizes.name} font-semibold text-gray-900 break-words">${therapist.name}</h3>
+            <h3 class="${textSizes.name} font-semibold break-words" style="color: #0a2342;">${therapist.name}</h3>
             <p class="${textSizes.title} text-blue-600 font-medium">${therapist.title || 'Therapist'}</p>
-            <p class="${textSizes.content} text-gray-500">${therapist.area}, ${therapist.city}</p>
+            <p class="${textSizes.content}" style="color: #6b7280;">${therapist.area}, ${therapist.city}</p>
           </div>
         </div>
         
-        <!-- Minimal info without icons -->
+        <!-- Minimal info without icons - NO STARS/RATINGS -->
         <div class="mb-${isMobile ? '3' : '4'} space-y-1">
-          <div class="flex items-center">${(() => { const ratings = [{ stars: "★★★★★", rating: "5.0" }, { stars: "★★★★☆", rating: "4.8" }, { stars: "★★★★☆", rating: "4.5" }, { stars: "★★★★☆", rating: "4.2" }, { stars: "★★★☆☆", rating: "3.9" }, { stars: "★★★☆☆", rating: "3.7" }]; const rating = ratings[globalIndex % ratings.length]; return `<span class="text-gray-400 text-sm">${rating.stars}</span><span class="${textSizes.content} text-gray-500 ml-1">(${rating.rating})</span>`; })()}</div>
-          <p class="${textSizes.content} text-gray-500 font-medium">${distanceText}</p>
-          ${therapist.cost ? `<p class="${textSizes.content} text-black font-medium">${therapist.cost}/session</p>` : ''}
+          <p class="${textSizes.content} font-medium" style="color: #6b7280;">${distanceText}</p>
+          ${therapist.cost ? `<p class="text-xs font-medium" style="color: #6b7280;">€${therapist.cost}/session</p>` : '<p class="text-xs font-medium" style="color: #6b7280;">€75/session</p>'}
         </div>
         
         <!-- Minimal buttons -->

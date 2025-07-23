@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Comprehensive Therapist Integration Debug</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="therapist-data.js"></script>
+</head>
+<body class="bg-gray-100 p-8">
+    <div class="max-w-6xl mx-auto">
+        <h1 class="text-3xl font-bold mb-6">🔧 Comprehensive Therapist Integration Debug</h1>
+        
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <!-- Issue Diagnostics -->
+            <div class="bg-white rounded-lg p-6 shadow-lg">
+                <h2 class="text-xl font-semibold mb-4">🔍 Issue Diagnostics</h2>
+                <button onclick="runFullDiagnosis()" class="bg-blue-500 text-white px-4 py-2 rounded mb-4">Run Full Diagnosis</button>
+                <div id="diagnosis-results" class="bg-gray-50 p-4 rounded text-sm overflow-auto max-h-96"></div>
+            </div>
+            
+            <!-- Live Test -->
+            <div class="bg-white rounded-lg p-6 shadow-lg">
+                <h2 class="text-xl font-semibold mb-4">🧪 Live Test</h2>
+                <button onclick="runLiveTest()" class="bg-green-500 text-white px-4 py-2 rounded mb-4 mr-2">Test Registration → Display</button>
+                <button onclick="clearTestData()" class="bg-red-500 text-white px-4 py-2 rounded mb-4">Clear Test Data</button>
+                <div id="test-results" class="bg-gray-50 p-4 rounded text-sm overflow-auto max-h-96"></div>
+            </div>
+            
+            <!-- Manual Fixes -->
+            <div class="bg-white rounded-lg p-6 shadow-lg">
+                <h2 class="text-xl font-semibold mb-4">🔧 Manual Fixes</h2>
+                <button onclick="forceIntegration()" class="bg-orange-500 text-white px-4 py-2 rounded mb-2 mr-2">Force Integration</button>
+                <button onclick="resetSystem()" class="bg-red-600 text-white px-4 py-2 rounded mb-2 mr-2">Reset System</button>
+                <button onclick="showCurrentData()" class="bg-purple-500 text-white px-4 py-2 rounded mb-2">Show All Data</button>
+                <div id="manual-results" class="bg-gray-50 p-4 rounded text-sm overflow-auto max-h-60"></div>
+            </div>
+            
+            <!-- Console -->
+            <div class="bg-white rounded-lg p-6 shadow-lg">
+                <h2 class="text-xl font-semibold mb-4">💻 Live Console</h2>
+                <button onclick="clearDebugConsole()" class="bg-gray-500 text-white px-4 py-2 rounded mb-4">Clear</button>
+                <div id="debug-console" class="bg-black text-green-400 p-4 rounded text-sm font-mono h-60 overflow-auto"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Console capture
+        const originalLog = console.log;
+        const originalError = console.error;
+        const originalWarn = console.warn;
+        
+        function addToDebugConsole(type, message) {
+            const consoleDiv = document.getElementById('debug-console');
+            const timestamp = new Date().toLocaleTimeString();
+            const typeColor = type === 'error' ? 'text-red-400' : type === 'warn' ? 'text-yellow-400' : 'text-green-400';
+            consoleDiv.innerHTML += `<div class="${typeColor}">[${timestamp}] ${type.toUpperCase()}: ${message}</div>`;
+            consoleDiv.scrollTop = consoleDiv.scrollHeight;
+        }
+        
+        console.log = function(...args) {
+            originalLog.apply(console, args);
+            addToDebugConsole('log', args.join(' '));
+        };
+        
+        console.error = function(...args) {
+            originalError.apply(console, args);
+            addToDebugConsole('error', args.join(' '));
+        };
+        
+        console.warn = function(...args) {
+            originalWarn.apply(console, args);
+            addToDebugConsole('warn', args.join(' '));
+        };
+        
+        function clearDebugConsole() {
+            document.getElementById('debug-console').innerHTML = '';
+        }
+        
+        function runFullDiagnosis() {
+            const results = document.getElementById('diagnosis-results');
+            let output = '<h3 class="font-semibold mb-4">🔍 Full System Diagnosis</h3>';
+            
+            // Issue #1: Registration Data Format
+            output += '<div class="mb-4"><h4 class="font-semibold text-blue-600">Issue #1: Registration Data Format</h4>';
+            const savedData = localStorage.getItem('therapistData');
+            if (savedData) {
+                try {
+                    const parsed = JSON.parse(savedData);
+                    output += `<p class="text-green-600">✅ localStorage has ${parsed.length} registered therapists</p>`;
+                    if (parsed.length > 0) {
+                        output += `<p class="text-xs text-gray-600">Latest: ${parsed[parsed.length-1].first_name} ${parsed[parsed.length-1].last_name} (ID: ${parsed[parsed.length-1].id})</p>`;
+                    }
+                } catch (e) {
+                    output += `<p class="text-red-600">❌ localStorage data corrupted: ${e.message}</p>`;
+                }
+            } else {
+                output += '<p class="text-yellow-600">⚠️ No localStorage data found</p>';
+            }
+            output += '</div>';
+            
+            // Issue #2: ID Conflicts
+            output += '<div class="mb-4"><h4 class="font-semibold text-blue-600">Issue #2: ID Conflicts</h4>';
+            if (window.therapistData && savedData) {
+                try {
+                    const registered = JSON.parse(savedData);
+                    const staticIds = window.therapistData.map(t => t.id);
+                    const registeredIds = registered.map(t => t.id);
+                    const conflicts = registeredIds.filter(id => staticIds.includes(id));
+                    
+                    if (conflicts.length > 0) {
+                        output += `<p class="text-red-600">❌ ID conflicts found: ${conflicts.join(', ')}</p>`;
+                    } else {
+                        output += '<p class="text-green-600">✅ No ID conflicts detected</p>';
+                    }
+                } catch (e) {
+                    output += `<p class="text-red-600">❌ Error checking IDs: ${e.message}</p>`;
+                }
+            } else {
+                output += '<p class="text-yellow-600">⚠️ Cannot check - missing data</p>';
+            }
+            output += '</div>';
+            
+            // Issue #3: Function Availability
+            output += '<div class="mb-4"><h4 class="font-semibold text-blue-600">Issue #3: Function Availability</h4>';
+            const functions = [
+                'loadAndMergeLocalStorageTherapists',
+                'populateTherapistCards', 
+                'populateCriteriaCards',
+                'simplePopulate',
+                'initializeDynamicFilters'
+            ];
+            
+            functions.forEach(func => {
+                const available = typeof window[func] === 'function';
+                const color = available ? 'text-green-600' : 'text-red-600';
+                const icon = available ? '✅' : '❌';
+                output += `<p class="${color}">${icon} ${func}</p>`;
+            });
+            output += '</div>';
+            
+            // Issue #4: Container Elements
+            output += '<div class="mb-4"><h4 class="font-semibold text-blue-600">Issue #4: Container Elements</h4>';
+            const containers = [
+                'therapist-cards-container',
+                'criteria-therapist-cards-container'
+            ];
+            
+            containers.forEach(containerId => {
+                const element = document.getElementById(containerId);
+                const exists = element !== null;
+                const color = exists ? 'text-green-600' : 'text-red-600';
+                const icon = exists ? '✅' : '❌';
+                output += `<p class="${color}">${icon} ${containerId}</p>`;
+            });
+            output += '</div>';
+            
+            // Issue #5: Current System State
+            output += '<div class="mb-4"><h4 class="font-semibold text-blue-600">Issue #5: Current System State</h4>';
+            if (window.therapistData) {
+                output += `<p class="text-green-600">✅ window.therapistData has ${window.therapistData.length} therapists</p>`;
+                const lastFew = window.therapistData.slice(-3);
+                output += '<p class="text-xs text-gray-600">Last 3:</p>';
+                lastFew.forEach(t => {
+                    output += `<p class="text-xs text-gray-600">- Dr. ${t.first_name} ${t.last_name} (ID: ${t.id})</p>`;
+                });
+            } else {
+                output += '<p class="text-red-600">❌ window.therapistData not available</p>';
+            }
+            output += '</div>';
+            
+            // Issue #6: Integration Test
+            output += '<div class="mb-4"><h4 class="font-semibold text-blue-600">Issue #6: Integration Test</h4>';
+            if (window.loadAndMergeLocalStorageTherapists) {
+                const originalCount = window.therapistData ? window.therapistData.length : 0;
+                const added = window.loadAndMergeLocalStorageTherapists();
+                const newCount = window.therapistData ? window.therapistData.length : 0;
+                
+                output += `<p class="text-blue-600">📊 Original: ${originalCount}, Added: ${added.length}, New Total: ${newCount}</p>`;
+                
+                if (added.length > 0) {
+                    output += '<p class="text-green-600">✅ Integration function working</p>';
+                    added.forEach(t => {
+                        output += `<p class="text-xs text-green-600">+ Dr. ${t.first_name} ${t.last_name} (ID: ${t.id})</p>`;
+                    });
+                } else {
+                    output += '<p class="text-yellow-600">⚠️ No new therapists to integrate</p>';
+                }
+            } else {
+                output += '<p class="text-red-600">❌ Integration function not available</p>';
+            }
+            output += '</div>';
+            
+            results.innerHTML = output;
+            console.log('🔍 Full diagnosis completed');
+        }
+        
+        function runLiveTest() {
+            const results = document.getElementById('test-results');
+            let output = '<h3 class="font-semibold mb-4">🧪 Live Registration Test</h3>';
+            
+            console.log('🧪 Starting live registration test...');
+            
+            // Step 1: Create test therapist
+            const testTherapist = {
+                id: 9999,
+                first_name: "Live",
+                last_name: "TestTherapist",
+                gender: "female",
+                title: "Psychologist",
+                photo: "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHZpZXdCb3g9IjAgMCA2NCA2NCIgZmlsbD0ibm9uZSI+CjxjaXJjbGUgY3g9IjMyIiBjeT0iMzIiIHI9IjMyIiBmaWxsPSIjRjNGNEY2Ii8+PC9zdmc+",
+                address: "123 Live Test Street, Test Area, Athens 10000",
+                city: "Athens",
+                cityKey: "athens",
+                area: "Live Test Area",
+                areaKey: "live_test_area",
+                therapy_approaches: ["Cognitive Behavioral Therapy (CBT)"],
+                therapy_approaches_keys: ["cbt"],
+                languages: ["Greek", "English"],
+                languageKeys: ["greek", "english"],
+                cost: 85,
+                currency: "EUR",
+                services: {
+                    in_person_therapy: {
+                        available: true,
+                        price: 85,
+                        description: "Live test therapy session",
+                        duration: 1
+                    }
+                },
+                experience: "Live testing specialist",
+                education: "Live Test University",
+                about: "This is a live test therapist for debugging",
+                rating: 4.5,
+                availability: "Morning",
+                availabilityKey: "morning",
+                distance: 0,
+                coordinates: { lat: 37.9838, lng: 23.7275 }
+            };
+            
+            // Step 2: Save to localStorage (simulating registration)
+            const existingData = localStorage.getItem('therapistData');
+            let therapistArray = [];
+            
+            if (existingData) {
+                try {
+                    therapistArray = JSON.parse(existingData);
+                } catch (e) {
+                    console.error('Error parsing existing data:', e);
+                }
+            }
+            
+            // Remove any existing test therapist
+            therapistArray = therapistArray.filter(t => t.id !== 9999);
+            therapistArray.push(testTherapist);
+            localStorage.setItem('therapistData', JSON.stringify(therapistArray));
+            
+            output += '<p class="text-green-600">✅ Step 1: Test therapist saved to localStorage</p>';
+            console.log('✅ Test therapist saved to localStorage');
+            
+            // Step 3: Test integration
+            if (window.loadAndMergeLocalStorageTherapists) {
+                const originalCount = window.therapistData ? window.therapistData.length : 0;
+                const added = window.loadAndMergeLocalStorageTherapists();
+                const newCount = window.therapistData ? window.therapistData.length : 0;
+                
+                output += `<p class="text-blue-600">📊 Step 2: Integration - ${originalCount} → ${newCount} (added ${added.length})</p>`;
+                
+                if (added.some(t => t.id === 9999)) {
+                    output += '<p class="text-green-600">✅ Step 3: Test therapist found in integration</p>';
+                } else {
+                    output += '<p class="text-red-600">❌ Step 3: Test therapist NOT found in integration</p>';
+                }
+            } else {
+                output += '<p class="text-red-600">❌ Step 2: Integration function not available</p>';
+            }
+            
+            // Step 4: Test card population
+            const locationContainer = document.getElementById('therapist-cards-container');
+            const criteriaContainer = document.getElementById('criteria-therapist-cards-container');
+            
+            if (locationContainer && window.simplePopulate) {
+                window.simplePopulate(locationContainer, true);
+                output += '<p class="text-green-600">✅ Step 4a: Location cards populated</p>';
+            } else {
+                output += '<p class="text-red-600">❌ Step 4a: Cannot populate location cards</p>';
+            }
+            
+            if (criteriaContainer && window.populateCriteriaCards) {
+                window.populateCriteriaCards();
+                output += '<p class="text-green-600">✅ Step 4b: Criteria cards populated</p>';
+            } else {
+                output += '<p class="text-red-600">❌ Step 4b: Cannot populate criteria cards</p>';
+            }
+            
+            // Step 5: Verify visibility
+            setTimeout(() => {
+                const currentTherapists = window.therapistData || [];
+                const testVisible = currentTherapists.some(t => t.id === 9999);
+                
+                if (testVisible) {
+                    output += '<p class="text-green-600">✅ Step 5: Test therapist visible in system</p>';
+                } else {
+                    output += '<p class="text-red-600">❌ Step 5: Test therapist NOT visible in system</p>';
+                }
+                
+                results.innerHTML = output;
+            }, 500);
+            
+            results.innerHTML = output;
+            console.log('🧪 Live test completed');
+        }
+        
+        function clearTestData() {
+            // Remove test therapists
+            const existingData = localStorage.getItem('therapistData');
+            if (existingData) {
+                try {
+                    let therapistArray = JSON.parse(existingData);
+                    therapistArray = therapistArray.filter(t => t.id !== 9999 && t.id !== 999);
+                    localStorage.setItem('therapistData', JSON.stringify(therapistArray));
+                } catch (e) {
+                    console.error('Error clearing test data:', e);
+                }
+            }
+            
+            document.getElementById('test-results').innerHTML = '<p class="text-green-600">✅ Test data cleared</p>';
+            console.log('🧹 Test data cleared');
+        }
+        
+        function forceIntegration() {
+            const results = document.getElementById('manual-results');
+            let output = '<h4 class="font-semibold mb-2">🔧 Force Integration</h4>';
+            
+            if (window.loadAndMergeLocalStorageTherapists) {
+                const added = window.loadAndMergeLocalStorageTherapists();
+                output += `<p class="text-blue-600">➕ Added ${added.length} therapists</p>`;
+                
+                // Force update all containers
+                const locationContainer = document.getElementById('therapist-cards-container');
+                const criteriaContainer = document.getElementById('criteria-therapist-cards-container');
+                
+                if (locationContainer && window.simplePopulate) {
+                    window.simplePopulate(locationContainer, true);
+                    output += '<p class="text-green-600">✅ Location cards updated</p>';
+                }
+                
+                if (criteriaContainer && window.populateCriteriaCards) {
+                    window.populateCriteriaCards();
+                    output += '<p class="text-green-600">✅ Criteria cards updated</p>';
+                }
+                
+                if (window.initializeDynamicFilters) {
+                    window.initializeDynamicFilters();
+                    output += '<p class="text-green-600">✅ Filters refreshed</p>';
+                }
+            } else {
+                output += '<p class="text-red-600">❌ Integration function not available</p>';
+            }
+            
+            results.innerHTML = output;
+            console.log('🔧 Force integration completed');
+        }
+        
+        function resetSystem() {
+            localStorage.removeItem('therapistData');
+            localStorage.removeItem('therapistCoordinates');
+            
+            if (window.therapistData) {
+                // Reload original data
+                location.reload();
+            }
+            
+            document.getElementById('manual-results').innerHTML = '<p class="text-yellow-600">⚠️ System reset - page will reload</p>';
+            console.log('🔄 System reset');
+        }
+        
+        function showCurrentData() {
+            const results = document.getElementById('manual-results');
+            let output = '<h4 class="font-semibold mb-2">📊 Current Data State</h4>';
+            
+            // localStorage
+            const savedData = localStorage.getItem('therapistData');
+            if (savedData) {
+                try {
+                    const parsed = JSON.parse(savedData);
+                    output += `<p><strong>localStorage:</strong> ${parsed.length} therapists</p>`;
+                    parsed.forEach(t => {
+                        output += `<p class="text-xs text-gray-600">- Dr. ${t.first_name} ${t.last_name} (ID: ${t.id})</p>`;
+                    });
+                } catch (e) {
+                    output += '<p class="text-red-600">localStorage corrupted</p>';
+                }
+            } else {
+                output += '<p>localStorage: empty</p>';
+            }
+            
+            // window.therapistData
+            if (window.therapistData) {
+                output += `<p class="mt-2"><strong>window.therapistData:</strong> ${window.therapistData.length} therapists</p>`;
+                const last5 = window.therapistData.slice(-5);
+                last5.forEach(t => {
+                    output += `<p class="text-xs text-gray-600">- Dr. ${t.first_name} ${t.last_name} (ID: ${t.id})</p>`;
+                });
+            } else {
+                output += '<p class="mt-2">window.therapistData: not available</p>';
+            }
+            
+            results.innerHTML = output;
+        }
+        
+        // Auto-run diagnosis on load
+        setTimeout(() => {
+            console.log('🔧 Comprehensive debug tool loaded');
+            runFullDiagnosis();
+        }, 1000);
+    </script>
+</body>
+</html> 
